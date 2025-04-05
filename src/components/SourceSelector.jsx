@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './SourceSelector.module.css';
 
 const SourceSelector = ({ onSourceChange, currentSource }) => {
   const sources = [
@@ -7,11 +8,11 @@ const SourceSelector = ({ onSourceChange, currentSource }) => {
   ];
 
   return (
-    <div className="source-selector">
+    <div className={styles.sourceSelector}>
       <h3>Text Source</h3>
-      <div className="radio-group">
+      <div className={styles.radioGroup}>
         {sources.map(source => (
-          <label key={source.id} className="radio-label">
+          <label key={source.id} className={styles.radioLabel}>
             <input
               type="radio"
               name="textSource"
