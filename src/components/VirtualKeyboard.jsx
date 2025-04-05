@@ -2,27 +2,65 @@ import React from 'react';
 import styles from './VirtualKeyboard.module.css';
 
 const VirtualKeyboard = ({ nextKey }) => {
+  // Helper function to determine which Shift key to highlight
+  const getShiftSide = (letter) => {
+    const leftHandKeys = 'qwertasdfgzxcvb1234567';
+    return leftHandKeys.includes(letter.toLowerCase()) ? 'ShiftRight' : 'ShiftLeft';
+  };
+
+  // Helper function to check if a key should be highlighted
+  const shouldHighlight = (keyObj, nextKey) => {
+    if (!nextKey) return false;
+    
+    // Handle space character
+    if (nextKey === ' ' && keyObj.key === 'Space') return true;
+    
+    // Direct match (case insensitive)
+    if (keyObj.key.toLowerCase() === nextKey.toLowerCase()) return true;
+    
+    // Check if shift should be highlighted for capitals or special chars
+    if (keyObj.key === 'ShiftLeft' || keyObj.key === 'ShiftRight') {
+      // For capital letters
+      if (nextKey === nextKey.toUpperCase() && nextKey !== nextKey.toLowerCase()) {
+        return keyObj.key === getShiftSide(nextKey);
+      }
+      // For special characters that need shift
+      if (keyObj.shiftChar && keyObj.shiftChar === nextKey) {
+        return keyObj.key === getShiftSide(keyObj.key);
+      }
+    }
+
+    return false;
+  };
+
+  // Split display into primary and secondary characters
+  const splitDisplay = (display) => {
+    if (!display.includes(' ')) return { primary: display, secondary: '' };
+    const [first, second] = display.split(' ');
+    return { primary: first, secondary: second };
+  };
+
   const keyboardLayout = [
     // Numbers row
     [
-      { key: '`', display: '`' },
-      { key: '1', display: '1' },
-      { key: '2', display: '2' },
-      { key: '3', display: '3' },
-      { key: '4', display: '4' },
-      { key: '5', display: '5' },
-      { key: '6', display: '6' },
-      { key: '7', display: '7' },
-      { key: '8', display: '8' },
-      { key: '9', display: '9' },
-      { key: '0', display: '0' },
-      { key: '-', display: '-' },
-      { key: '=', display: '=' },
+      { key: '`', display: '~\n`', shiftChar: '~' },
+      { key: '1', display: '!\n1', shiftChar: '!' },
+      { key: '2', display: '@\n2', shiftChar: '@' },
+      { key: '3', display: '#\n3', shiftChar: '#' },
+      { key: '4', display: '$\n4', shiftChar: '$' },
+      { key: '5', display: '%\n5', shiftChar: '%' },
+      { key: '6', display: '^\n6', shiftChar: '^' },
+      { key: '7', display: '&\n7', shiftChar: '&' },
+      { key: '8', display: '*\n8', shiftChar: '*' },
+      { key: '9', display: '(\n9', shiftChar: '(' },
+      { key: '0', display: ')\n0', shiftChar: ')' },
+      { key: '-', display: '_\n-', shiftChar: '_' },
+      { key: '=', display: '+\n=', shiftChar: '+' },
       { key: 'Backspace', display: '⌫', wide: true }
     ],
     // QWERTY row
     [
-      { key: 'Tab', display: '⇥', wide: true },
+      { key: 'Tab', display: 'Tab\n⇥', wide: true },
       { key: 'q', display: 'Q' },
       { key: 'w', display: 'W' },
       { key: 'e', display: 'E' },
@@ -33,13 +71,13 @@ const VirtualKeyboard = ({ nextKey }) => {
       { key: 'i', display: 'I' },
       { key: 'o', display: 'O' },
       { key: 'p', display: 'P' },
-      { key: '[', display: '[' },
-      { key: ']', display: ']' },
-      { key: '\\', display: '\\' }
+      { key: '[', display: '{\n[', shiftChar: '{' },
+      { key: ']', display: '}\n]', shiftChar: '}' },
+      { key: '\\', display: '|\n\\', shiftChar: '|', wide: true }
     ],
     // Home row
     [
-      { key: 'CapsLock', display: '⇪', wide: true },
+      { key: 'CapsLock', display: 'CapsLock\n⇪', wide: true },
       { key: 'a', display: 'A' },
       { key: 's', display: 'S' },
       { key: 'd', display: 'D' },
@@ -49,13 +87,13 @@ const VirtualKeyboard = ({ nextKey }) => {
       { key: 'j', display: 'J' },
       { key: 'k', display: 'K' },
       { key: 'l', display: 'L' },
-      { key: ';', display: ';' },
-      { key: "'", display: "'" },
-      { key: 'Enter', display: '⏎', wide: true }
+      { key: ';', display: ':\n;', shiftChar: ':' },
+      { key: "'", display: '"\n\'', shiftChar: '"' },
+      { key: 'Enter', display: 'Enter\n⏎', wide: true }
     ],
     // Shift row
     [
-      { key: 'ShiftLeft', display: '⇧', wide: true },
+      { key: 'ShiftLeft', display: 'Shift\n⇧', wide: true },
       { key: 'z', display: 'Z' },
       { key: 'x', display: 'X' },
       { key: 'c', display: 'C' },
@@ -63,10 +101,10 @@ const VirtualKeyboard = ({ nextKey }) => {
       { key: 'b', display: 'B' },
       { key: 'n', display: 'N' },
       { key: 'm', display: 'M' },
-      { key: ',', display: ',' },
-      { key: '.', display: '.' },
-      { key: '/', display: '/' },
-      { key: 'ShiftRight', display: '⇧', wide: true }
+      { key: ',', display: '<\n,', shiftChar: '<' },
+      { key: '.', display: '>\n.', shiftChar: '>' },
+      { key: '/', display: '?\n/', shiftChar: '?' },
+      { key: 'ShiftRight', display: 'Shift\n⇧', wide: true }
     ],
     // Bottom row
     [
@@ -84,17 +122,30 @@ const VirtualKeyboard = ({ nextKey }) => {
     <div className={styles.keyboard}>
       {keyboardLayout.map((row, rowIndex) => (
         <div key={rowIndex} className={styles.keyboardRow}>
-          {row.map((keyObj) => (
-            <div
-              key={keyObj.key}
-              className={`${styles.key} 
-                ${keyObj.wide ? styles.wideKey : ''} 
-                ${keyObj.extraWide ? styles.spaceKey : ''} 
-                ${keyObj.key.toLowerCase() === nextKey.toLowerCase() ? styles.highlight : ''}`}
-            >
-              {keyObj.display}
-            </div>
-          ))}
+          {row.map((keyObj) => {
+            const { primary, secondary } = splitDisplay(keyObj.display);
+            return (
+              <div
+                key={keyObj.key}
+                className={`${styles.key} 
+                  ${keyObj.wide ? styles.wideKey : ''} 
+                  ${keyObj.extraWide ? styles.spaceKey : ''} 
+                  ${shouldHighlight(keyObj, nextKey) ? styles.highlight : ''}`}
+              >
+                {primary.includes('\n') ? (
+                  <div className={styles.dualChar}>
+                    {primary.split('\n').map((char, i) => (
+                      <span key={i} className={i === 0 ? styles.topChar : styles.bottomChar}>
+                        {char}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className={styles.singleChar}>{primary}</span>
+                )}
+              </div>
+            );
+          })}
         </div>
       ))}
     </div>

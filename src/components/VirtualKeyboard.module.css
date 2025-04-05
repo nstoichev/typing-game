@@ -3,13 +3,12 @@
   flex-direction: column;
   gap: 6px;
   background-color: #1a1a1a;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   margin-bottom: 20px;
   user-select: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  width: fit-content;
-  margin: 0 auto 20px;
+  margin: 0 20px;
 }
 
 .keyboardRow {
@@ -24,8 +23,8 @@
   background-color: #2a2a2a;
   border-radius: 6px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 4px;
+  box-sizing: border-box;
   color: #ffffff;
   font-size: 14px;
   font-weight: 500;
@@ -34,6 +33,20 @@
   transition: all 0.15s ease;
   border: 1px solid #3a3a3a;
   position: relative;
+}
+
+.key > div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.key div span {
+  width: 100%;
+  display: block;
+  line-height: 1;
 }
 
 .key::after {
@@ -50,7 +63,6 @@
 
 .wideKey {
   flex: 1.5;
-  font-size: 16px;
 }
 
 .spaceKey {
