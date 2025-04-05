@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import ResultsModal from './components/ResultsModal'
+import words from './jsons/words.json'
 
 function App() {
   const [text, setText] = useState('')
@@ -16,6 +17,37 @@ function App() {
 
   const CHUNK_SIZE = 100
   const CHUNK_BUFFER = 20 // Additional buffer to prevent word splitting
+
+  const generateRandomText = () => {
+    const wordCounts = new Map()
+    let result = ''
+    let lastWord = ''
+    let totalLength = 0
+    const targetLength = 300 // Target length for the text
+
+    while (totalLength < targetLength) {
+      // Get a random word
+      const randomIndex = Math.floor(Math.random() * words.length)
+      const word = words[randomIndex]
+      
+      // Skip if:
+      // 1. It's the same as the last word
+      // 2. It's already been used twice
+      if (word === lastWord || (wordCounts.get(word) || 0) >= 2) {
+        continue
+      }
+
+      // Add the word to the text
+      result += word + ' '
+      totalLength += word.length + 1 // +1 for the space
+      
+      // Update counts
+      wordCounts.set(word, (wordCounts.get(word) || 0) + 1)
+      lastWord = word
+    }
+
+    return result.trim()
+  }
 
   const getChunkWithWordBoundary = (text, startIndex) => {
     const maxEndIndex = startIndex + CHUNK_SIZE + CHUNK_BUFFER
@@ -36,13 +68,11 @@ function App() {
   }
 
   useEffect(() => {
-    const hardcodedText = "The quick brown fox jumps over the lazy dog. This is a test sentence to demonstrate typing speed and accuracy." +
-      "The quick brown fox jumps over the lazy dog. This is a test sentence to demonstrate typing speed and accuracy."
-    
-    setText(hardcodedText)
-    const firstChunk = getChunkWithWordBoundary(hardcodedText, 0)
+    const randomText = generateRandomText()
+    setText(randomText)
+    const firstChunk = getChunkWithWordBoundary(randomText, 0)
     setCurrentChunk(firstChunk.chunk)
-    const secondChunk = getChunkWithWordBoundary(hardcodedText, firstChunk.endIndex)
+    const secondChunk = getChunkWithWordBoundary(randomText, firstChunk.endIndex)
     setNextChunk(secondChunk.chunk)
     setCurrentChunkStartIndex(0)
   }, [])
@@ -51,6 +81,20 @@ function App() {
     if (!isActive) {
       setIsActive(true)
       setStartTime(Date.now())
+    }
+
+    if (e.key === 'Backspace') {
+      if (typedText.length > 0) {
+        const newTypedText = typedText.slice(0, -1)
+        setTypedText(newTypedText)
+        
+        // Check if the backspace fixed a wrong word
+        const lastTypedChar = text[currentChunkStartIndex + newTypedText.length]
+        if (lastTypedChar === typedText[typedText.length - 1]) {
+          setWrongWords(prev => prev.slice(0, -1))
+        }
+      }
+      return
     }
 
     if (e.key.length === 1) {
@@ -77,7 +121,10 @@ function App() {
           lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
           nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
         )
-        setWrongWords(prev => [...prev, currentWord])
+        // Only add the word if it's not a space and not already in the wrong words list
+        if (currentWord.trim() && !wrongWords.includes(currentWord)) {
+          setWrongWords(prev => [...prev, currentWord])
+        }
       }
     }
   }, [text, typedText, currentChunk, isActive, currentChunkStartIndex])
