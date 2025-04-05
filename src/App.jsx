@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import ResultsModal from './components/ResultsModal'
 import Settings from './components/Settings'
+import ActionButtons from './components/ActionButtons'
 import words from './jsons/words.json'
 
 function App() {
@@ -210,6 +211,24 @@ function App() {
     setCurrentChunkStartIndex(0)
   }
 
+  const handleRestart = () => {
+    setTypedText('')
+    setWrongWords([])
+    setIsComplete(false)
+    setIsActive(false)
+    setStats(null)
+    setStartTime(null)
+    const firstChunk = getChunkWithWordBoundary(text, 0)
+    setCurrentChunk(firstChunk.chunk)
+    const secondChunk = getChunkWithWordBoundary(text, firstChunk.endIndex)
+    setNextChunk(secondChunk.chunk)
+    setCurrentChunkStartIndex(0)
+  }
+
+  const handleGenerate = () => {
+    initializeText()
+  }
+
   useEffect(() => {
     if (currentChunkStartIndex + typedText.length === text.length && text.length > 0) {
       const endTime = Date.now()
@@ -248,6 +267,10 @@ function App() {
           {renderText(nextChunk, true)}
         </div>
       )}
+      <ActionButtons
+        onRestart={handleRestart}
+        onGenerate={handleGenerate}
+      />
       {isComplete && stats && (
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} />
       )}
