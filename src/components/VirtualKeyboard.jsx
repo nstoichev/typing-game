@@ -1,7 +1,102 @@
 import React from 'react';
 import styles from './VirtualKeyboard.module.css';
 
-const VirtualKeyboard = ({ nextKey }) => {
+const fingerColors = {
+  leftPinky: '#FF69B4',    // Pink
+  rightPinky: '#FF69B4',   // Pink
+  leftRing: '#FFB6C1',     // Light Pink
+  rightRing: '#FFB6C1',    // Light Pink
+  leftMiddle: '#98FB98',   // Pale Green
+  rightMiddle: '#98FB98',  // Pale Green
+  leftIndex: '#87CEEB',    // Sky Blue
+  rightIndex: '#87CEEB',   // Sky Blue
+  leftThumb: '#DDA0DD',    // Plum
+  rightThumb: '#DDA0DD'    // Plum
+};
+
+const getFingerForKey = (key) => {
+  const fingerMap = {
+    // Left pinky
+    '`': 'leftPinky', '~': 'leftPinky', '1': 'leftPinky', '!': 'leftPinky',
+    'Tab': 'leftPinky', 'q': 'leftPinky', 'Q': 'leftPinky',
+    'CapsLock': 'leftPinky', 'a': 'leftPinky', 'A': 'leftPinky',
+    'ShiftLeft': 'leftPinky', 'z': 'leftPinky', 'Z': 'leftPinky',
+    'ControlLeft': 'leftPinky',
+
+    // Left ring
+    '2': 'leftRing', '@': 'leftRing',
+    'w': 'leftRing', 'W': 'leftRing',
+    's': 'leftRing', 'S': 'leftRing',
+    'x': 'leftRing', 'X': 'leftRing',
+
+    // Left middle
+    '3': 'leftMiddle', '#': 'leftMiddle',
+    'e': 'leftMiddle', 'E': 'leftMiddle',
+    'd': 'leftMiddle', 'D': 'leftMiddle',
+    'c': 'leftMiddle', 'C': 'leftMiddle',
+
+    // Left index
+    '4': 'leftIndex', '$': 'leftIndex',
+    '5': 'leftIndex', '%': 'leftIndex',
+    'r': 'leftIndex', 'R': 'leftIndex',
+    't': 'leftIndex', 'T': 'leftIndex',
+    'f': 'leftIndex', 'F': 'leftIndex',
+    'g': 'leftIndex', 'G': 'leftIndex',
+    'v': 'leftIndex', 'V': 'leftIndex',
+    'b': 'leftIndex', 'B': 'leftIndex',
+
+    // Left thumb
+    'Space': 'leftThumb',
+    'AltLeft': 'leftThumb',
+    'WindowLeft': 'leftThumb',
+
+    // Right thumb
+    'AltRight': 'rightThumb',
+    'WindowRight': 'rightThumb',
+
+    // Right index
+    '6': 'rightIndex', '^': 'rightIndex',
+    '7': 'rightIndex', '&': 'rightIndex',
+    'y': 'rightIndex', 'Y': 'rightIndex',
+    'u': 'rightIndex', 'U': 'rightIndex',
+    'h': 'rightIndex', 'H': 'rightIndex',
+    'j': 'rightIndex', 'J': 'rightIndex',
+    'n': 'rightIndex', 'N': 'rightIndex',
+    'm': 'rightIndex', 'M': 'rightIndex',
+
+    // Right middle
+    '8': 'rightMiddle', '*': 'rightMiddle',
+    'i': 'rightMiddle', 'I': 'rightMiddle',
+    'k': 'rightMiddle', 'K': 'rightMiddle',
+    ',': 'rightMiddle', '<': 'rightMiddle',
+
+    // Right ring
+    '9': 'rightRing', '(': 'rightRing',
+    'o': 'rightRing', 'O': 'rightRing',
+    'l': 'rightRing', 'L': 'rightRing',
+    '.': 'rightRing', '>': 'rightRing',
+
+    // Right pinky
+    '0': 'rightPinky', ')': 'rightPinky',
+    '-': 'rightPinky', '_': 'rightPinky',
+    '=': 'rightPinky', '+': 'rightPinky',
+    'Backspace': 'rightPinky',
+    'p': 'rightPinky', 'P': 'rightPinky',
+    '[': 'rightPinky', '{': 'rightPinky',
+    ']': 'rightPinky', '}': 'rightPinky',
+    '\\': 'rightPinky', '|': 'rightPinky',
+    ';': 'rightPinky', ':': 'rightPinky',
+    "'": 'rightPinky', '"': 'rightPinky',
+    'Enter': 'rightPinky',
+    '/': 'rightPinky', '?': 'rightPinky',
+    'ShiftRight': 'rightPinky',
+    'ControlRight': 'rightPinky'
+  };
+
+  return fingerMap[key] || null;
+};
+
+const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
   // Helper function to determine which Shift key to highlight
   const getShiftSide = (letter) => {
     const leftHandKeys = 'qwertasdfgzxcvb1234567';
@@ -124,6 +219,9 @@ const VirtualKeyboard = ({ nextKey }) => {
         <div key={rowIndex} className={styles.keyboardRow}>
           {row.map((keyObj) => {
             const { primary, secondary } = splitDisplay(keyObj.display);
+            const finger = getFingerForKey(keyObj.key);
+            const fingerColor = showFingerLayout && finger ? fingerColors[finger] : undefined;
+            
             return (
               <div
                 key={keyObj.key}
@@ -131,6 +229,7 @@ const VirtualKeyboard = ({ nextKey }) => {
                   ${keyObj.wide ? styles.wideKey : ''} 
                   ${keyObj.extraWide ? styles.spaceKey : ''} 
                   ${shouldHighlight(keyObj, nextKey) ? styles.highlight : ''}`}
+                style={fingerColor ? { backgroundColor: fingerColor } : undefined}
               >
                 {primary.includes('\n') ? (
                   <div className={styles.dualChar}>

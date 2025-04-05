@@ -47,6 +47,7 @@
   width: 100%;
   display: block;
   line-height: 1;
+  text-align: left;
 }
 
 .key::after {
@@ -70,7 +71,7 @@
 }
 
 .highlight {
-  background-color: #4a9eff;
+  background-color: #4a9eff !important;
   transform: translateY(2px);
   box-shadow: 0 0 8px rgba(74, 158, 255, 0.4),
               inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -79,4 +80,27 @@
 
 .highlight::after {
   opacity: 0;
+}
+
+.dualChar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.topChar {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.bottomChar {
+  font-size: 14px;
+}
+
+.singleChar {
+  font-size: 14px;
+  text-align: center;
 } 

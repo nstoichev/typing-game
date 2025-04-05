@@ -9,6 +9,7 @@ import { useState } from 'react'
 
 function App() {
   const [showKeyboard, setShowKeyboard] = useState(true);
+  const [showFingerLayout, setShowFingerLayout] = useState(false);
   const {
     currentChunk,
     nextChunk,
@@ -43,6 +44,8 @@ function App() {
         currentSource={textSource}
         showKeyboard={showKeyboard}
         onToggleKeyboard={setShowKeyboard}
+        showFingerLayout={showFingerLayout}
+        onToggleFingerLayout={setShowFingerLayout}
       />
       <TextDisplay
         currentChunk={currentChunk}
@@ -50,7 +53,10 @@ function App() {
         typedText={typedText}
       />
       {showKeyboard && (
-        <VirtualKeyboard nextKey={getNextKey()} />
+        <VirtualKeyboard 
+          nextKey={getNextKey()} 
+          showFingerLayout={showFingerLayout}
+        />
       )}
       <ActionButtons
         onRestart={handleRestart}

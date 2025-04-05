@@ -2,7 +2,14 @@ import React from 'react';
 import SourceSelector from './SourceSelector';
 import styles from './Settings.module.css';
 
-const Settings = ({ onSourceChange, currentSource, showKeyboard, onToggleKeyboard }) => {
+const Settings = ({ 
+  onSourceChange, 
+  currentSource, 
+  showKeyboard, 
+  onToggleKeyboard,
+  showFingerLayout,
+  onToggleFingerLayout 
+}) => {
   return (
     <div className={styles.settings}>
       <h2>Settings</h2>
@@ -22,6 +29,18 @@ const Settings = ({ onSourceChange, currentSource, showKeyboard, onToggleKeyboar
           Show Virtual Keyboard
         </label>
       </div>
+      {showKeyboard && (
+        <div className={styles.settingRow}>
+          <label className={`${styles.settingLabel} ${styles.indented}`}>
+            <input
+              type="checkbox"
+              checked={showFingerLayout}
+              onChange={(e) => onToggleFingerLayout(e.target.checked)}
+            />
+            Show Fingers Layout
+          </label>
+        </div>
+      )}
     </div>
   );
 };
