@@ -68,3 +68,12 @@
   50% { opacity: 0 }
   100% { opacity: 1 }
 }
+
+.word {
+  display: inline-block;
+  position: relative;
+}
+
+.word span {
+  margin-bottom: 0;
+}
