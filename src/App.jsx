@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import './App.css'
 import ResultsModal from './components/ResultsModal'
+import Settings from './components/Settings'
 import words from './jsons/words.json'
 
 function App() {
@@ -14,34 +15,54 @@ function App() {
   const [stats, setStats] = useState(null)
   const [currentChunkStartIndex, setCurrentChunkStartIndex] = useState(0)
   const [startTime, setStartTime] = useState(null)
+  const [textSource, setTextSource] = useState('random')
 
   const CHUNK_SIZE = 100
-  const CHUNK_BUFFER = 20 // Additional buffer to prevent word splitting
+  const CHUNK_BUFFER = 20
+  const MAX_WIKI_ATTEMPTS = 5
+
+  const isValidText = (text) => {
+    // Only allow basic ASCII characters, spaces, and common punctuation
+    return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
+  };
+
+  const fetchWikipediaText = async (attempt = 1) => {
+    try {
+      const response = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+      const data = await response.json();
+      const extract = data.extract;
+      
+      if (isValidText(extract)) {
+        return extract;
+      } else if (attempt < MAX_WIKI_ATTEMPTS) {
+        return fetchWikipediaText(attempt + 1);
+      } else {
+        throw new Error('Could not find valid Wikipedia text after maximum attempts');
+      }
+    } catch (error) {
+      console.error('Error fetching Wikipedia text:', error);
+      return generateRandomText();
+    }
+  };
 
   const generateRandomText = () => {
     const wordCounts = new Map()
     let result = ''
     let lastWord = ''
     let totalLength = 0
-    const targetLength = 300 // Target length for the text
+    const targetLength = 300
 
     while (totalLength < targetLength) {
-      // Get a random word
       const randomIndex = Math.floor(Math.random() * words.length)
       const word = words[randomIndex]
       
-      // Skip if:
-      // 1. It's the same as the last word
-      // 2. It's already been used twice
       if (word === lastWord || (wordCounts.get(word) || 0) >= 2) {
         continue
       }
 
-      // Add the word to the text
       result += word + ' '
-      totalLength += word.length + 1 // +1 for the space
+      totalLength += word.length + 1
       
-      // Update counts
       wordCounts.set(word, (wordCounts.get(word) || 0) + 1)
       lastWord = word
     }
@@ -53,29 +74,47 @@ function App() {
     const maxEndIndex = startIndex + CHUNK_SIZE + CHUNK_BUFFER
     const endIndex = Math.min(maxEndIndex, text.length)
     
-    // Find the last space within our chunk range
     let lastSpaceIndex = text.lastIndexOf(' ', endIndex)
     
-    // If we can't find a space within our range, just take the whole text
     if (lastSpaceIndex <= startIndex) {
       lastSpaceIndex = endIndex
     }
     
     return {
-      chunk: text.slice(startIndex, lastSpaceIndex + 1), // Include the space
+      chunk: text.slice(startIndex, lastSpaceIndex + 1),
       endIndex: lastSpaceIndex + 1
     }
   }
 
+  const initializeText = async () => {
+    let newText;
+    if (textSource === 'wikipedia') {
+      newText = await fetchWikipediaText();
+    } else {
+      newText = generateRandomText();
+    }
+    
+    setText(newText);
+    const firstChunk = getChunkWithWordBoundary(newText, 0);
+    setCurrentChunk(firstChunk.chunk);
+    const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
+    setNextChunk(secondChunk.chunk);
+    setCurrentChunkStartIndex(0);
+    setTypedText('');
+    setWrongWords([]);
+    setIsComplete(false);
+    setIsActive(false);
+    setStats(null);
+    setStartTime(null);
+  };
+
   useEffect(() => {
-    const randomText = generateRandomText()
-    setText(randomText)
-    const firstChunk = getChunkWithWordBoundary(randomText, 0)
-    setCurrentChunk(firstChunk.chunk)
-    const secondChunk = getChunkWithWordBoundary(randomText, firstChunk.endIndex)
-    setNextChunk(secondChunk.chunk)
-    setCurrentChunkStartIndex(0)
-  }, [])
+    initializeText();
+  }, [textSource]);
+
+  const handleSourceChange = (source) => {
+    setTextSource(source);
+  };
 
   const handleKeyDown = useCallback((e) => {
     if (!isActive) {
@@ -197,6 +236,10 @@ function App() {
 
   return (
     <div className="typing-container">
+      <Settings 
+        onSourceChange={handleSourceChange}
+        currentSource={textSource}
+      />
       <div className="text-display">
         {renderText(currentChunk)}
       </div>
