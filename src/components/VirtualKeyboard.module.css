@@ -1,0 +1,70 @@
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #1a1a1a;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  user-select: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: fit-content;
+  margin: 0 auto 20px;
+}
+
+.keyboardRow {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.key {
+  width: 44px;
+  height: 44px;
+  background-color: #2a2a2a;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.15s ease;
+  border: 1px solid #3a3a3a;
+  position: relative;
+}
+
+.key::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.wideKey {
+  flex: 1.5;
+  font-size: 16px;
+}
+
+.spaceKey {
+  flex: 6;
+}
+
+.highlight {
+  background-color: #4a9eff;
+  transform: translateY(2px);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.4),
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: #5aafff;
+}
+
+.highlight::after {
+  opacity: 0;
+} 
