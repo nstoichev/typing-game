@@ -1,183 +1,107 @@
-import { useState, useEffect, useRef } from 'react'
-import ResultsModal from './components/ResultsModal'
+import { useState, useEffect, useCallback } from 'react'
 import './App.css'
+import ResultsModal from './components/ResultsModal'
 
 function App() {
-  const [fullText, setFullText] = useState('This is a sample text for typing practice. You can replace this with any longer text later. The goal is to type this text as accurately and quickly as possible. Your performance will be measured in words per minute (WPM) and accuracy percentage. Good luck! Your performance will be measured in words per minute (WPM) and accuracy percentage. Good luck!')
-  const [userInput, setUserInput] = useState('')
-  const [startTime, setStartTime] = useState(null)
+  const [text, setText] = useState('')
+  const [currentChunk, setCurrentChunk] = useState('')
+  const [nextChunk, setNextChunk] = useState('')
+  const [typedText, setTypedText] = useState('')
+  const [wrongWords, setWrongWords] = useState([])
   const [isComplete, setIsComplete] = useState(false)
-  const [stats, setStats] = useState({ wpm: 0, accuracy: 0, wrongWords: [] })
-  const [elapsedTime, setElapsedTime] = useState(0)
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [currentChunkIndex, setCurrentChunkIndex] = useState(0)
-  const textareaRef = useRef(null)
-  const timerRef = useRef(null)
+  const [isActive, setIsActive] = useState(false)
+  const [stats, setStats] = useState(null)
+  const [currentChunkStartIndex, setCurrentChunkStartIndex] = useState(0)
+  const [startTime, setStartTime] = useState(null)
 
-  // Split text into chunks of approximately 150 characters, ensuring we don't split words
-  const splitTextIntoChunks = (text) => {
-    const chunks = []
-    const targetChunkSize = 150
-    let currentIndex = 0
+  const CHUNK_SIZE = 100
+  const CHUNK_BUFFER = 20 // Additional buffer to prevent word splitting
 
-    while (currentIndex < text.length) {
-      let chunkEnd = currentIndex + targetChunkSize
-      
-      // If we're not at the end of the text, find the next space to avoid splitting words
-      if (chunkEnd < text.length) {
-        while (chunkEnd < text.length && text[chunkEnd] !== ' ') {
-          chunkEnd++
-        }
-      } else {
-        chunkEnd = text.length
-      }
-
-      chunks.push(text.slice(currentIndex, chunkEnd))
-      currentIndex = chunkEnd
-    }
-
-    return chunks
-  }
-
-  const chunks = useRef(splitTextIntoChunks(fullText))
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current)
-      }
-    }
-  }, [])
-
-  const startTimer = () => {
-    if (!isTimerRunning) {
-      setIsTimerRunning(true)
-      const start = Date.now() - elapsedTime
-      timerRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - start)
-      }, 10)
-    }
-  }
-
-  const stopTimer = () => {
-    if (isTimerRunning) {
-      setIsTimerRunning(false)
-      clearInterval(timerRef.current)
-    }
-  }
-
-  const formatTime = (ms) => {
-    const minutes = Math.floor(ms / 60000)
-    const seconds = Math.floor((ms % 60000) / 1000)
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`
-  }
-
-  const handleDisplayClick = () => {
-    if (textareaRef.current) {
-      textareaRef.current.focus()
-    }
-  }
-
-  const calculateStats = (input) => {
-    const words = fullText.split(' ').length
-    const timeInMinutes = elapsedTime / 60000
-    const wpm = Math.round(words / timeInMinutes)
+  const getChunkWithWordBoundary = (text, startIndex) => {
+    const maxEndIndex = startIndex + CHUNK_SIZE + CHUNK_BUFFER
+    const endIndex = Math.min(maxEndIndex, text.length)
     
-    // Calculate accuracy and wrong words
-    let wrongChars = 0
-    const wrongWords = []
-    let currentWord = ''
-    let currentWordStart = 0
+    // Find the last space within our chunk range
+    let lastSpaceIndex = text.lastIndexOf(' ', endIndex)
     
-    for (let i = 0; i < fullText.length; i++) {
-      if (fullText[i] === ' ' || i === fullText.length - 1) {
-        // End of word
-        if (i === fullText.length - 1) {
-          currentWord += fullText[i]
-        }
-        if (input.slice(currentWordStart, i + 1) !== fullText.slice(currentWordStart, i + 1)) {
-          wrongWords.push(currentWord)
-        }
-        currentWord = ''
-        currentWordStart = i + 1
-      } else {
-        currentWord += fullText[i]
-        if (input[i] !== fullText[i]) {
-          wrongChars++
-        }
-      }
+    // If we can't find a space within our range, just take the whole text
+    if (lastSpaceIndex <= startIndex) {
+      lastSpaceIndex = endIndex
     }
-    
-    const accuracy = Math.round(((fullText.length - wrongChars) / fullText.length) * 100)
     
     return {
-      wpm,
-      accuracy,
-      wrongWords
+      chunk: text.slice(startIndex, lastSpaceIndex + 1), // Include the space
+      endIndex: lastSpaceIndex + 1
     }
   }
 
-  const handleInputChange = (e) => {
-    const input = e.target.value
-    setUserInput(input)
+  useEffect(() => {
+    const hardcodedText = "The quick brown fox jumps over the lazy dog. This is a test sentence to demonstrate typing speed and accuracy." +
+      "The quick brown fox jumps over the lazy dog. This is a test sentence to demonstrate typing speed and accuracy."
+    
+    setText(hardcodedText)
+    const firstChunk = getChunkWithWordBoundary(hardcodedText, 0)
+    setCurrentChunk(firstChunk.chunk)
+    const secondChunk = getChunkWithWordBoundary(hardcodedText, firstChunk.endIndex)
+    setNextChunk(secondChunk.chunk)
+    setCurrentChunkStartIndex(0)
+  }, [])
 
-    // Start timer only when user starts typing
-    if (input.length === 1) {
+  const handleKeyDown = useCallback((e) => {
+    if (!isActive) {
+      setIsActive(true)
       setStartTime(Date.now())
-      startTimer()
     }
 
-    // Check if we need to load the next chunk
-    if (currentChunkIndex < chunks.current.length - 1) {
-      const currentChunk = chunks.current[currentChunkIndex]
-      const previousChunksLength = chunks.current.slice(0, currentChunkIndex).join('').length
-      if (input.length >= previousChunksLength + currentChunk.length) {
-        setCurrentChunkIndex(prev => prev + 1)
+    if (e.key.length === 1) {
+      const newTypedText = typedText + e.key
+      setTypedText(newTypedText)
+      
+      // Check if we need to move to the next chunk
+      if (newTypedText.length === currentChunk.length) {
+        const nextChunkStart = currentChunkStartIndex + currentChunk.length
+        const nextChunk = getChunkWithWordBoundary(text, nextChunkStart)
+        const nextNextChunk = getChunkWithWordBoundary(text, nextChunk.endIndex)
+        
+        setCurrentChunk(nextChunk.chunk)
+        setNextChunk(nextNextChunk.chunk)
+        setCurrentChunkStartIndex(nextChunkStart)
+        setTypedText('')
+      }
+
+      if (e.key !== text[currentChunkStartIndex + typedText.length]) {
+        // Find the current word being typed
+        const lastSpaceIndex = text.lastIndexOf(' ', currentChunkStartIndex + typedText.length)
+        const nextSpaceIndex = text.indexOf(' ', currentChunkStartIndex + typedText.length)
+        const currentWord = text.slice(
+          lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
+          nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
+        )
+        setWrongWords(prev => [...prev, currentWord])
       }
     }
-
-    if (input.length === fullText.length) {
-      stopTimer()
-      const newStats = calculateStats(input)
-      setStats(newStats)
-      setIsComplete(true)
-    }
-  }
-
-  const handleInputBlur = () => {
-    stopTimer()
-  }
-
-  const handleTryAgain = () => {
-    setUserInput('')
-    setStartTime(null)
-    setElapsedTime(0)
-    setIsComplete(false)
-    setIsTimerRunning(false)
-    setCurrentChunkIndex(0)
-    if (timerRef.current) {
-      clearInterval(timerRef.current)
-    }
-    textareaRef.current.focus()
-  }
+  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex])
 
   const renderText = (text, isPreview = false) => {
-    const currentChunk = chunks.current[currentChunkIndex]
-    const previousChunksLength = chunks.current.slice(0, currentChunkIndex).join('').length
-    const userInputInChunk = userInput.slice(
-      previousChunksLength,
-      previousChunksLength + currentChunk.length
-    )
+    // For preview chunks, just return plain text
+    if (isPreview) {
+      return text.split('').map((char, index) => (
+        <span key={index}>{char}</span>
+      ))
+    }
 
     return text.split('').map((char, index) => {
+      const isTyped = index < typedText.length
+      const isWrong = isTyped && typedText[index] !== char
+      const isCurrent = index === typedText.length
+
       let className = ''
-      if (!isPreview) {
-        if (index < userInputInChunk.length) {
-          className = userInputInChunk[index] === char ? 'typed' : 'wrong'
-        } else if (index === userInputInChunk.length && userInput.length < fullText.length) {
-          className = 'current'
-        }
+      if (isTyped) {
+        className = isWrong ? 'wrong' : 'typed'
+      } else if (isCurrent) {
+        className = 'current'
       }
+
       return (
         <span key={index} className={className}>
           {char}
@@ -186,30 +110,56 @@ function App() {
     })
   }
 
+  const handleTryAgain = () => {
+    setTypedText('')
+    setWrongWords([])
+    setIsComplete(false)
+    setIsActive(false)
+    setStats(null)
+    setStartTime(null)
+    const firstChunk = getChunkWithWordBoundary(text, 0)
+    setCurrentChunk(firstChunk.chunk)
+    const secondChunk = getChunkWithWordBoundary(text, firstChunk.endIndex)
+    setNextChunk(secondChunk.chunk)
+    setCurrentChunkStartIndex(0)
+  }
+
+  useEffect(() => {
+    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0) {
+      const endTime = Date.now()
+      const timeInMinutes = (endTime - startTime) / 60000
+      const words = text.split(' ').length
+      const wpm = Math.round(words / timeInMinutes)
+      const accuracy = Math.round(((text.length - wrongWords.length) / text.length) * 100)
+      
+      setStats({
+        wpm,
+        accuracy,
+        wrongWords: [...new Set(wrongWords)]
+      })
+      setIsComplete(true)
+    }
+  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
+
   return (
     <div className="typing-container">
-      <div className="timer">{formatTime(elapsedTime)}</div>
-      <textarea
-        ref={textareaRef}
-        className="typing-input"
-        value={userInput}
-        onChange={handleInputChange}
-        onBlur={handleInputBlur}
-        placeholder="Start typing..."
-      />      
-      <div className="text-display" onClick={handleDisplayClick}>
-        {renderText(chunks.current[currentChunkIndex])}
+      <div className="text-display">
+        {renderText(currentChunk)}
       </div>
-      {currentChunkIndex < chunks.current.length - 1 && (
+      {nextChunk && (
         <div className="text-preview">
-          {renderText(chunks.current[currentChunkIndex + 1], true)}
+          {renderText(nextChunk, true)}
         </div>
       )}
-      {isComplete && (
-        <ResultsModal
-          stats={stats}
-          onTryAgain={handleTryAgain}
-        />
+      {isComplete && stats && (
+        <ResultsModal stats={stats} onTryAgain={handleTryAgain} />
       )}
     </div>
   )

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types'
+import './ResultsModal.css'
 
 function ResultsModal({ stats, onTryAgain }) {
   return (
@@ -7,21 +8,21 @@ function ResultsModal({ stats, onTryAgain }) {
         <h2>Typing Results</h2>
         <div className="stats-grid">
           <div className="stat-item">
-            <span className="stat-value">{stats.wpm}</span>
-            <span className="stat-label">WPM</span>
+            <div className="stat-value">{stats.wpm}</div>
+            <div className="stat-label">WPM</div>
           </div>
           <div className="stat-item">
-            <span className="stat-value">{stats.accuracy}%</span>
-            <span className="stat-label">Accuracy</span>
+            <div className="stat-value">{stats.accuracy}%</div>
+            <div className="stat-label">Accuracy</div>
           </div>
           <div className="stat-item">
-            <span className="stat-value">{stats.wrongWords.length}</span>
-            <span className="stat-label">Mistakes</span>
+            <div className="stat-value">{stats.wrongWords.length}</div>
+            <div className="stat-label">Mistakes</div>
           </div>
         </div>
         {stats.wrongWords.length > 0 && (
           <div className="mistakes-section">
-            <h3>Words with Mistakes:</h3>
+            <h3>Words to Practice</h3>
             <div className="wrong-words-list">
               {stats.wrongWords.map((word, index) => (
                 <span key={index} className="wrong-word">{word}</span>
