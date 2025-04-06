@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import './ResultsModal.css'
 
-function ResultsModal({ stats, onTryAgain }) {
+function ResultsModal({ stats, onTryAgain, onGenerate }) {
   return (
     <div className="modal-overlay">
       <div className="stats-modal">
@@ -30,9 +30,14 @@ function ResultsModal({ stats, onTryAgain }) {
             </div>
           </div>
         )}
-        <button className="try-again-button" onClick={onTryAgain}>
-          Try Again
-        </button>
+        <div className="action-buttons">
+          <button className="action-button" onClick={onTryAgain}>
+            Restart
+          </button>
+          <button className="action-button" onClick={onGenerate}>
+            Generate New Text
+          </button>
+        </div>
       </div>
     </div>
   )
@@ -44,7 +49,8 @@ ResultsModal.propTypes = {
     accuracy: PropTypes.number.isRequired,
     wrongWords: PropTypes.array.isRequired
   }).isRequired,
-  onTryAgain: PropTypes.func.isRequired
+  onTryAgain: PropTypes.func.isRequired,
+  onGenerate: PropTypes.func.isRequired
 }
 
 export default ResultsModal 

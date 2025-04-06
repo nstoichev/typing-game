@@ -76,7 +76,7 @@ function App() {
         onOneMinuteGame={handleOneMinuteGame}
       />
       {isComplete && stats && (
-        <ResultsModal stats={stats} onTryAgain={handleTryAgain} />
+        <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={handleGenerate} />
       )}
     </div>
   )

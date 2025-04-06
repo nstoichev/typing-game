@@ -116,4 +116,31 @@
 
 .try-again-button:hover {
   background-color: #357abd;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.action-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background-color: #357abd;
+  transform: translateY(-2px);
+}
+
+.action-button:active {
+  transform: translateY(0);
 } 
