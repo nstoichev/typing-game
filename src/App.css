@@ -1,9 +1,10 @@
 .typing-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 8rem 0 2rem 0;
+  padding: 6rem 0 2rem 0;
   font-family: 'Courier New', monospace;
   position: relative;
+  min-height: 100vh;
 }
 
 .countdown-display {
@@ -16,7 +17,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: absolute;
-  top: 40px;
+  top: 20px;
   left: 0;
   width: 100%;
   box-sizing: border-box;

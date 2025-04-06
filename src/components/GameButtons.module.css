@@ -2,7 +2,10 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
-  margin: 2rem 0;
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
 }
 
 .button {
