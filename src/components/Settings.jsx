@@ -1,6 +1,7 @@
 import React from 'react';
 import SourceSelector from './SourceSelector';
 import styles from './Settings.module.css';
+import PropTypes from 'prop-types';
 
 const Settings = ({ 
   onSourceChange, 
@@ -8,7 +9,8 @@ const Settings = ({
   showKeyboard, 
   onToggleKeyboard,
   showFingerLayout,
-  onToggleFingerLayout 
+  onToggleFingerLayout,
+  hideSourceSelector
 }) => {
   return (
     <div className={styles.settings}>
@@ -17,6 +19,7 @@ const Settings = ({
         <SourceSelector 
           onSourceChange={onSourceChange}
           currentSource={currentSource}
+          hide={hideSourceSelector}
         />
       </div>
       <div className={styles.settingRow}>
@@ -43,6 +46,16 @@ const Settings = ({
       )}
     </div>
   );
+};
+
+Settings.propTypes = {
+  onSourceChange: PropTypes.func.isRequired,
+  currentSource: PropTypes.string.isRequired,
+  showKeyboard: PropTypes.bool.isRequired,
+  onToggleKeyboard: PropTypes.func.isRequired,
+  showFingerLayout: PropTypes.bool.isRequired,
+  onToggleFingerLayout: PropTypes.func.isRequired,
+  hideSourceSelector: PropTypes.bool
 };
 
 export default Settings; 

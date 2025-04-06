@@ -23,4 +23,22 @@
 
 .button:active {
   transform: translateY(0);
+}
+
+.button:disabled {
+  background-color: #95a5a6;
+  cursor: not-allowed;
+  transform: none;
+  opacity: 0.7;
+}
+
+.button:disabled:hover {
+  background-color: #95a5a6;
+  transform: none;
+}
+
+.button.active {
+  background-color: #27ae60;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #27ae60;
+  transform: translateY(-2px);
 } 

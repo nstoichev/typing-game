@@ -1,11 +1,16 @@
 import React from 'react';
 import styles from './SourceSelector.module.css';
+import PropTypes from 'prop-types';
 
-const SourceSelector = ({ onSourceChange, currentSource }) => {
+const SourceSelector = ({ onSourceChange, currentSource, hide }) => {
   const sources = [
     { id: 'random', label: 'Random Text' },
     { id: 'wikipedia', label: 'Wikipedia' }
   ];
+
+  if (hide) {
+    return null;
+  }
 
   return (
     <div className={styles.sourceSelector}>
@@ -26,6 +31,12 @@ const SourceSelector = ({ onSourceChange, currentSource }) => {
       </div>
     </div>
   );
+};
+
+SourceSelector.propTypes = {
+  onSourceChange: PropTypes.func.isRequired,
+  currentSource: PropTypes.string.isRequired,
+  hide: PropTypes.bool
 };
 
 export default SourceSelector; 

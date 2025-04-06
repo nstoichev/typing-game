@@ -35,8 +35,8 @@ function App() {
     initializeText()
   }
 
-  const handleOneMinuteGame = () => {
-    setCountdown(60); // Set initial countdown to 60 seconds
+  const handleOneMinuteGame = (seconds) => {
+    setCountdown(seconds); // Set countdown to null for freestyle mode or 60 for one minute mode
   }
 
   const getNextKey = () => {
@@ -54,6 +54,7 @@ function App() {
         onToggleKeyboard={setShowKeyboard}
         showFingerLayout={showFingerLayout}
         onToggleFingerLayout={setShowFingerLayout}
+        hideSourceSelector={countdown !== null}
       />
       {countdown !== null && (
         <div className="countdown-display">
@@ -77,6 +78,8 @@ function App() {
       />
       <GameButtons
         onOneMinuteGame={handleOneMinuteGame}
+        disabled={textSource !== 'random'}
+        isOneMinuteMode={countdown !== null}
       />
       {isComplete && stats && (
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={handleGenerate} />
