@@ -19,6 +19,7 @@ export const useTypingGame = () => {
   const [startTime, setStartTime] = useState(null);
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
+  const [textBuffer, setTextBuffer] = useState('');
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -65,8 +66,6 @@ export const useTypingGame = () => {
       lastWord = word;
     }
 
-    console.log('Generated text length:', result.length);
-    console.log('Generated text:', result);
     return result.trim();
   };
 
@@ -97,14 +96,6 @@ export const useTypingGame = () => {
     }
     
     const chunk = text.slice(startIndex, lastSpaceIndex + 1);
-    console.log('Chunk details:', {
-      startIndex,
-      maxEndIndex,
-      endIndex,
-      lastSpaceIndex,
-      chunkLength: chunk.length,
-      chunk: chunk
-    });
     
     return {
       chunk: chunk,
@@ -112,30 +103,25 @@ export const useTypingGame = () => {
     };
   };
 
-  const initializeText = async () => {
+  const generateMoreText = () => {
     let newText;
     if (textSource === 'wikipedia') {
-      newText = await fetchWikipediaText();
+      // For Wikipedia, we'll need to fetch new text
+      // For now, we'll use random text as fallback
+      newText = generateRandomText();
     } else {
       newText = generateRandomText();
     }
-    
-    console.log('Total text length:', newText.length);
-    setText(newText);
-    const firstChunk = getChunkWithWordBoundary(newText, 0);
-    setCurrentChunk(firstChunk.chunk);
-    const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
-    setNextChunk(secondChunk.chunk);
-    console.log('First chunk length:', firstChunk.chunk.length);
-    console.log('Second chunk length:', secondChunk.chunk.length);
-    setCurrentChunkStartIndex(0);
-    setTypedText('');
-    setWrongWords([]);
-    setWrongChars(0);
-    setIsComplete(false);
-    setIsActive(false);
-    setStats(null);
-    setStartTime(null);
+    return newText;
+  };
+
+  const ensurePreviewText = (currentText, currentPosition) => {
+    // If we're in countdown mode and don't have enough text for preview
+    if (countdown !== null && currentPosition + CHUNK_SIZE * 2 >= currentText.length) {
+      const newText = generateMoreText();
+      return currentText + ' ' + newText;
+    }
+    return currentText;
   };
 
   const handleKeyDown = useCallback((e) => {
@@ -180,8 +166,15 @@ export const useTypingGame = () => {
       
       if (newTypedText.length === currentChunk.length) {
         const nextChunkStart = currentChunkStartIndex + currentChunk.length;
-        const nextChunk = getChunkWithWordBoundary(text, nextChunkStart);
-        const nextNextChunk = getChunkWithWordBoundary(text, nextChunk.endIndex);
+        
+        // Ensure we have enough text for preview
+        const updatedText = ensurePreviewText(text, nextChunkStart);
+        if (updatedText !== text) {
+          setText(updatedText);
+        }
+
+        const nextChunk = getChunkWithWordBoundary(updatedText, nextChunkStart);
+        const nextNextChunk = getChunkWithWordBoundary(updatedText, nextChunk.endIndex);
         
         setCurrentChunk(nextChunk.chunk);
         setNextChunk(nextNextChunk.chunk);
@@ -260,6 +253,45 @@ export const useTypingGame = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [handleKeyDown]);
+
+  const initializeText = async () => {
+    let newText;
+    if (textSource === 'wikipedia') {
+      newText = await fetchWikipediaText();
+    } else {
+      newText = generateRandomText();
+    }
+    
+    // For countdown mode, generate more initial text
+    if (countdown !== null) {
+      const additionalText = generateMoreText();
+      newText = newText + ' ' + additionalText;
+    }
+    
+    setText(newText);
+    const firstChunk = getChunkWithWordBoundary(newText, 0);
+    setCurrentChunk(firstChunk.chunk);
+    
+    // Ensure we have enough text for preview in countdown mode
+    if (countdown !== null) {
+      const updatedText = ensurePreviewText(newText, firstChunk.endIndex);
+      if (updatedText !== newText) {
+        setText(updatedText);
+        newText = updatedText;
+      }
+    }
+    
+    const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
+    setNextChunk(secondChunk.chunk);
+    setCurrentChunkStartIndex(0);
+    setTypedText('');
+    setWrongWords([]);
+    setWrongChars(0);
+    setIsComplete(false);
+    setIsActive(false);
+    setStats(null);
+    setStartTime(null);
+  };
 
   return {
     currentChunk,
