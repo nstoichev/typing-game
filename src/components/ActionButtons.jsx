@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './ActionButtons.module.css';
 
-const ActionButtons = ({ onRestart, onGenerate }) => {
+const ActionButtons = ({ onRestart, onGenerate, onOneMinuteGame }) => {
   const handleMouseUp = (e) => {
     e.target.blur();
   };
@@ -23,13 +23,21 @@ const ActionButtons = ({ onRestart, onGenerate }) => {
       >
         Generate New Text
       </button>
+      <button 
+        className={styles.button} 
+        onClick={onOneMinuteGame}
+        onMouseUp={handleMouseUp}
+      >
+        1 Minute Game
+      </button>
     </div>
   );
 };
 
 ActionButtons.propTypes = {
   onRestart: PropTypes.func.isRequired,
-  onGenerate: PropTypes.func.isRequired
+  onGenerate: PropTypes.func.isRequired,
+  onOneMinuteGame: PropTypes.func.isRequired
 };
 
 export default ActionButtons; 

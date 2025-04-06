@@ -20,7 +20,10 @@ function App() {
     handleRestart,
     handleTryAgain,
     initializeText,
-    setTextSource
+    setTextSource,
+    isActive,
+    countdown,
+    setCountdown
   } = useTypingGame()
 
   const handleSourceChange = (source) => {
@@ -29,6 +32,10 @@ function App() {
 
   const handleGenerate = () => {
     initializeText()
+  }
+
+  const handleOneMinuteGame = () => {
+    setCountdown(60); // Set initial countdown to 60 seconds
   }
 
   const getNextKey = () => {
@@ -47,6 +54,11 @@ function App() {
         showFingerLayout={showFingerLayout}
         onToggleFingerLayout={setShowFingerLayout}
       />
+      {countdown !== null && (
+        <div className="countdown-display">
+          {countdown} seconds
+        </div>
+      )}
       <TextDisplay
         currentChunk={currentChunk}
         nextChunk={nextChunk}
@@ -61,6 +73,7 @@ function App() {
       <ActionButtons
         onRestart={handleRestart}
         onGenerate={handleGenerate}
+        onOneMinuteGame={handleOneMinuteGame}
       />
       {isComplete && stats && (
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} />

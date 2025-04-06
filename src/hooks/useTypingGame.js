@@ -11,12 +11,14 @@ export const useTypingGame = () => {
   const [nextChunk, setNextChunk] = useState('');
   const [typedText, setTypedText] = useState('');
   const [wrongWords, setWrongWords] = useState([]);
+  const [wrongChars, setWrongChars] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [stats, setStats] = useState(null);
   const [currentChunkStartIndex, setCurrentChunkStartIndex] = useState(0);
   const [startTime, setStartTime] = useState(null);
   const [textSource, setTextSource] = useState('random');
+  const [countdown, setCountdown] = useState(null);
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -98,6 +100,7 @@ export const useTypingGame = () => {
     setCurrentChunkStartIndex(0);
     setTypedText('');
     setWrongWords([]);
+    setWrongChars(0);
     setIsComplete(false);
     setIsActive(false);
     setStats(null);
@@ -108,6 +111,17 @@ export const useTypingGame = () => {
     if (!isActive) {
       setIsActive(true);
       setStartTime(Date.now());
+      if (countdown === 60) {
+        const timer = setInterval(() => {
+          setCountdown(prev => {
+            if (prev <= 0) {
+              clearInterval(timer);
+              return null;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      }
     }
 
     if (e.key === 'Backspace') {
@@ -117,7 +131,7 @@ export const useTypingGame = () => {
         
         const lastTypedChar = text[currentChunkStartIndex + newTypedText.length];
         if (lastTypedChar === typedText[typedText.length - 1]) {
-          setWrongWords(prev => prev.slice(0, -1));
+          setWrongChars(prev => prev - 1);
         }
       }
       return;
@@ -126,6 +140,10 @@ export const useTypingGame = () => {
     if (e.key.length === 1) {
       const newTypedText = typedText + e.key;
       setTypedText(newTypedText);
+      
+      if (e.key !== text[currentChunkStartIndex + typedText.length]) {
+        setWrongChars(prev => prev + 1);
+      }
       
       if (newTypedText.length === currentChunk.length) {
         const nextChunkStart = currentChunkStartIndex + currentChunk.length;
@@ -150,11 +168,12 @@ export const useTypingGame = () => {
         }
       }
     }
-  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex]);
+  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown]);
 
   const handleTryAgain = () => {
     setTypedText('');
     setWrongWords([]);
+    setWrongChars(0);
     setIsComplete(false);
     setIsActive(false);
     setStats(null);
@@ -175,12 +194,14 @@ export const useTypingGame = () => {
   }, [textSource]);
 
   useEffect(() => {
-    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0) {
+    // Normal mode - when completing the entire text
+    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0 && countdown === null) {
       const endTime = Date.now();
       const timeInMinutes = (endTime - startTime) / 60000;
-      const words = text.split(' ').length;
-      const wpm = Math.round(words / timeInMinutes);
-      const accuracy = Math.round(((text.length - wrongWords.length) / text.length) * 100);
+      const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
+      const textLength = totalTypedText.length;
+      const wpm = Math.round((textLength / 5) / timeInMinutes);
+      const accuracy = Math.round(((textLength - wrongChars) / textLength) * 100);
       
       setStats({
         wpm,
@@ -189,7 +210,23 @@ export const useTypingGame = () => {
       });
       setIsComplete(true);
     }
-  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime]);
+    // Countdown mode - when timer reaches 0
+    else if (countdown === 0 && !isComplete) {
+      const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
+      const textLength = totalTypedText.length;
+      const wpm = Math.round((textLength / 5) / 1); // Exactly 1 minute for countdown mode
+      
+      const accuracy = Math.round(((textLength - wrongChars) / textLength) * 100);
+      
+      setStats({
+        wpm,
+        accuracy,
+        wrongWords: [...new Set(wrongWords)]
+      });
+      setIsComplete(true);
+      setIsActive(false);
+    }
+  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -208,6 +245,9 @@ export const useTypingGame = () => {
     handleRestart,
     handleTryAgain,
     initializeText,
-    setTextSource
+    setTextSource,
+    isActive,
+    countdown,
+    setCountdown
   };
 }; 

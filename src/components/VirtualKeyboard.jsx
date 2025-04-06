@@ -204,11 +204,11 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
     // Bottom row
     [
       { key: 'ControlLeft', display: 'Ctrl', wide: true },
-      { key: 'WindowLeft', display: '⊞', wide: false },
-      { key: 'AltLeft', display: 'Alt', wide: false },
+      { key: 'WindowLeft', display: '⊞', wide: true },
+      { key: 'AltLeft', display: 'Alt', wide: true },
       { key: 'Space', display: ' ', extraWide: true },
-      { key: 'AltRight', display: 'Alt', wide: false },
-      { key: 'WindowRight', display: '⊞', wide: false },
+      { key: 'AltRight', display: 'Alt', wide: true },
+      { key: 'WindowRight', display: '⊞', wide: true },
       { key: 'ControlRight', display: 'Ctrl', wide: true }
     ]
   ];
