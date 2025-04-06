@@ -2,6 +2,7 @@ import './App.css'
 import ResultsModal from './components/ResultsModal'
 import Settings from './components/Settings'
 import ActionButtons from './components/ActionButtons'
+import GameButtons from './components/GameButtons'
 import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
 import { useTypingGame } from './hooks/useTypingGame'
@@ -73,6 +74,8 @@ function App() {
       <ActionButtons
         onRestart={handleRestart}
         onGenerate={handleGenerate}
+      />
+      <GameButtons
         onOneMinuteGame={handleOneMinuteGame}
       />
       {isComplete && stats && (

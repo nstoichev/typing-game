@@ -1,0 +1,26 @@
+.gameButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.button {
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.button:hover {
+  background-color: #27ae60;
+  transform: translateY(-2px);
+}
+
+.button:active {
+  transform: translateY(0);
+} 
