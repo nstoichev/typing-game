@@ -43,8 +43,8 @@
 }
 
 .wrong {
-  color: #ff4444;
   opacity: 1;
+  background-color: #ff4444;
 }
 
 .current {

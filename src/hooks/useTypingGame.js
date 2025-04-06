@@ -129,9 +129,10 @@ export const useTypingGame = () => {
         const newTypedText = typedText.slice(0, -1);
         setTypedText(newTypedText);
         
-        const lastTypedChar = text[currentChunkStartIndex + newTypedText.length];
-        if (lastTypedChar === typedText[typedText.length - 1]) {
-          setWrongChars(prev => prev - 1);
+        const removedChar = typedText[typedText.length - 1];
+        const correctChar = text[currentChunkStartIndex + newTypedText.length];
+        if (removedChar !== correctChar) {
+          setWrongChars(prev => Math.max(0, prev - 1));
         }
       }
       return;
@@ -141,7 +142,8 @@ export const useTypingGame = () => {
       const newTypedText = typedText + e.key;
       setTypedText(newTypedText);
       
-      if (e.key !== text[currentChunkStartIndex + typedText.length]) {
+      const currentChar = text[currentChunkStartIndex + typedText.length];
+      if (e.key !== currentChar) {
         setWrongChars(prev => prev + 1);
       }
       
@@ -194,10 +196,7 @@ export const useTypingGame = () => {
   }, [textSource]);
 
   useEffect(() => {
-    // Normal mode - when completing the entire text
-    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0 && countdown === null) {
-      const endTime = Date.now();
-      const timeInMinutes = (endTime - startTime) / 60000;
+    const calculateStats = (timeInMinutes) => {
       const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
       const textLength = totalTypedText.length;
       const wpm = Math.round((textLength / 5) / timeInMinutes);
@@ -209,21 +208,17 @@ export const useTypingGame = () => {
         wrongWords: [...new Set(wrongWords)]
       });
       setIsComplete(true);
+    };
+
+    // Normal mode - when completing the entire text
+    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0 && countdown === null) {
+      const endTime = Date.now();
+      const timeInMinutes = (endTime - startTime) / 60000;
+      calculateStats(timeInMinutes);
     }
     // Countdown mode - when timer reaches 0
     else if (countdown === 0 && !isComplete) {
-      const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
-      const textLength = totalTypedText.length;
-      const wpm = Math.round((textLength / 5) / 1); // Exactly 1 minute for countdown mode
-      
-      const accuracy = Math.round(((textLength - wrongChars) / textLength) * 100);
-      
-      setStats({
-        wpm,
-        accuracy,
-        wrongWords: [...new Set(wrongWords)]
-      });
-      setIsComplete(true);
+      calculateStats(1); // Exactly 1 minute for countdown mode
       setIsActive(false);
     }
   }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
