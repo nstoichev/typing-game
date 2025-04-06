@@ -65,12 +65,30 @@ export const useTypingGame = () => {
       lastWord = word;
     }
 
+    console.log('Generated text length:', result.length);
+    console.log('Generated text:', result);
     return result.trim();
   };
 
   const getChunkWithWordBoundary = (text, startIndex) => {
+    // If we're at the start and the entire text can fit in one chunk, return it all
+    if (startIndex === 0 && text.length <= CHUNK_SIZE + CHUNK_BUFFER) {
+      return {
+        chunk: text,
+        endIndex: text.length
+      };
+    }
+
     const maxEndIndex = startIndex + CHUNK_SIZE + CHUNK_BUFFER;
     const endIndex = Math.min(maxEndIndex, text.length);
+    
+    // If the remaining text can fit in this chunk, return it all
+    if (text.length - startIndex <= CHUNK_SIZE + CHUNK_BUFFER) {
+      return {
+        chunk: text.slice(startIndex),
+        endIndex: text.length
+      };
+    }
     
     let lastSpaceIndex = text.lastIndexOf(' ', endIndex);
     
@@ -78,8 +96,18 @@ export const useTypingGame = () => {
       lastSpaceIndex = endIndex;
     }
     
+    const chunk = text.slice(startIndex, lastSpaceIndex + 1);
+    console.log('Chunk details:', {
+      startIndex,
+      maxEndIndex,
+      endIndex,
+      lastSpaceIndex,
+      chunkLength: chunk.length,
+      chunk: chunk
+    });
+    
     return {
-      chunk: text.slice(startIndex, lastSpaceIndex + 1),
+      chunk: chunk,
       endIndex: lastSpaceIndex + 1
     };
   };
@@ -92,11 +120,14 @@ export const useTypingGame = () => {
       newText = generateRandomText();
     }
     
+    console.log('Total text length:', newText.length);
     setText(newText);
     const firstChunk = getChunkWithWordBoundary(newText, 0);
     setCurrentChunk(firstChunk.chunk);
     const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
     setNextChunk(secondChunk.chunk);
+    console.log('First chunk length:', firstChunk.chunk.length);
+    console.log('Second chunk length:', secondChunk.chunk.length);
     setCurrentChunkStartIndex(0);
     setTypedText('');
     setWrongWords([]);
