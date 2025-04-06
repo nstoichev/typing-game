@@ -19,7 +19,6 @@ export const useTypingGame = () => {
   const [startTime, setStartTime] = useState(null);
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
-  const [textBuffer, setTextBuffer] = useState('');
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -125,6 +124,11 @@ export const useTypingGame = () => {
   };
 
   const handleKeyDown = useCallback((e) => {
+    // Prevent any typing if the game is complete
+    if (isComplete) {
+      return;
+    }
+
     if (!isActive) {
       setIsActive(true);
       setStartTime(Date.now());
@@ -194,7 +198,7 @@ export const useTypingGame = () => {
         }
       }
     }
-  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown]);
+  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete]);
 
   const handleTryAgain = () => {
     setTypedText('');
