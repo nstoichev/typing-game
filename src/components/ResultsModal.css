@@ -143,4 +143,20 @@
 
 .action-button:active {
   transform: translateY(0);
+}
+
+.funny-message {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff8e1;
+  border-radius: 8px;
+  border: 2px dashed #ffc107;
+}
+
+.funny-message p {
+  margin: 0.5rem 0;
+  color: #ff9800;
+  font-size: 1rem;
+  font-style: italic;
+  text-align: center;
 } 

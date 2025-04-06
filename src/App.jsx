@@ -57,7 +57,7 @@ function App() {
       />
       {countdown !== null && (
         <div className="countdown-display">
-          {countdown} seconds
+          {countdown === 60 ? 'Start typing!' : `${countdown} seconds`}
         </div>
       )}
       <TextDisplay

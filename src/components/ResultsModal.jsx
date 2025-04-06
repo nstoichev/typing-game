@@ -2,6 +2,10 @@ import PropTypes from 'prop-types'
 import './ResultsModal.css'
 
 function ResultsModal({ stats, onTryAgain, onGenerate }) {
+  const MAX_WRONG_WORDS = 20;
+  const wrongWords = stats.wrongWords.slice(0, MAX_WRONG_WORDS);
+  const hasMoreWords = stats.wrongWords.length > MAX_WRONG_WORDS;
+
   return (
     <div className="modal-overlay">
       <div className="stats-modal">
@@ -23,11 +27,18 @@ function ResultsModal({ stats, onTryAgain, onGenerate }) {
         {stats.wrongWords.length > 0 && (
           <div className="mistakes-section">
             <h3>Words to Practice</h3>
-            <div className="wrong-words-list">
-              {stats.wrongWords.map((word, index) => (
-                <span key={index} className="wrong-word">{word}</span>
-              ))}
-            </div>
+            {!hasMoreWords && (
+              <div className="wrong-words-list">
+                {wrongWords.map((word, index) => (
+                  <span key={index} className="wrong-word">{word}</span>
+                ))}
+              </div>
+            )}
+            {hasMoreWords && (
+              <div className="funny-message">
+                <p>We stopped counting at 20! You're really going for the world record in typos! 🏆</p>
+              </div>
+            )}
           </div>
         )}
         <div className="action-buttons">
