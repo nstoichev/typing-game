@@ -22,7 +22,6 @@ function App() {
     handleTryAgain,
     initializeText,
     setTextSource,
-    isActive,
     countdown,
     setCountdown
   } = useTypingGame()

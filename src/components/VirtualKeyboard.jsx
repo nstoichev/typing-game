@@ -123,8 +123,18 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
       if (keyObj.shiftChar && keyObj.shiftChar === nextKey) {
         return keyObj.key === getShiftSide(keyObj.key);
       }
+      // Always highlight shift for shift characters
+      if (nextKey === '"' || nextKey === ':' || nextKey === '<' || nextKey === '>' || 
+          nextKey === '?' || nextKey === '{' || nextKey === '}' || nextKey === '|') {
+        return keyObj.key === getShiftSide(nextKey);
+      }
     }
 
+    // Handle special characters that are displayed differently
+    if (keyObj.shiftChar === nextKey) {
+      return true;
+    }
+    
     return false;
   };
 
