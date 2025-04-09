@@ -1,14 +1,17 @@
 import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
 import Settings from './components/Settings'
 import ActionButtons from './components/ActionButtons'
 import GameButtons from './components/GameButtons'
 import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
+import Navigation from './components/Navigation'
+import Practice from './pages/Practice'
 import { useTypingGame } from './hooks/useTypingGame'
 import { useState } from 'react'
 
-function App() {
+function Home() {
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [showFingerLayout, setShowFingerLayout] = useState(false);
   const {
@@ -35,7 +38,7 @@ function App() {
   }
 
   const handleOneMinuteGame = (seconds) => {
-    setCountdown(seconds); // Set countdown to null for freestyle mode or 60 for one minute mode
+    setCountdown(seconds);
   }
 
   const getNextKey = () => {
@@ -84,6 +87,20 @@ function App() {
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={handleGenerate} />
       )}
     </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <div className="app-container">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/practice" element={<Practice />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 
