@@ -10,18 +10,21 @@ const Settings = ({
   onToggleKeyboard,
   showFingerLayout,
   onToggleFingerLayout,
-  hideSourceSelector
+  hideSourceSelector,
+  showSourceSelector = true
 }) => {
   return (
     <div className={styles.settings}>
       <h2>Settings</h2>
-      <div className={styles.settingRow}>
-        <SourceSelector 
-          onSourceChange={onSourceChange}
-          currentSource={currentSource}
-          hide={hideSourceSelector}
-        />
-      </div>
+      {showSourceSelector && (
+        <div className={styles.settingRow}>
+          <SourceSelector 
+            onSourceChange={onSourceChange}
+            currentSource={currentSource}
+            hide={hideSourceSelector}
+          />
+        </div>
+      )}
       <div className={styles.settingRow}>
         <label className={styles.settingLabel}>
           <input
@@ -49,13 +52,14 @@ const Settings = ({
 };
 
 Settings.propTypes = {
-  onSourceChange: PropTypes.func.isRequired,
-  currentSource: PropTypes.string.isRequired,
+  onSourceChange: PropTypes.func,
+  currentSource: PropTypes.string,
   showKeyboard: PropTypes.bool.isRequired,
   onToggleKeyboard: PropTypes.func.isRequired,
   showFingerLayout: PropTypes.bool.isRequired,
   onToggleFingerLayout: PropTypes.func.isRequired,
-  hideSourceSelector: PropTypes.bool
+  hideSourceSelector: PropTypes.bool,
+  showSourceSelector: PropTypes.bool
 };
 
 export default Settings; 

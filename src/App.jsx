@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
 import Settings from './components/Settings'
 import ActionButtons from './components/ActionButtons'
-import GameButtons from './components/GameButtons'
 import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
 import Navigation from './components/Navigation'
@@ -35,10 +34,6 @@ function Home() {
 
   const handleGenerate = () => {
     initializeText()
-  }
-
-  const handleOneMinuteGame = (seconds) => {
-    setCountdown(seconds);
   }
 
   const getNextKey = () => {
@@ -77,11 +72,6 @@ function Home() {
       <ActionButtons
         onRestart={handleRestart}
         onGenerate={handleGenerate}
-      />
-      <GameButtons
-        onOneMinuteGame={handleOneMinuteGame}
-        disabled={textSource !== 'random'}
-        isOneMinuteMode={countdown !== null}
       />
       {isComplete && stats && (
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={handleGenerate} />

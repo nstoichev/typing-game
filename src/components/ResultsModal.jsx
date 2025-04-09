@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import './ResultsModal.css'
 
-function ResultsModal({ stats, onTryAgain, onGenerate }) {
+function ResultsModal({ stats, onTryAgain, onGenerate, isPracticeMode = false }) {
   const MAX_WRONG_WORDS = 20;
   const wrongWords = stats.wrongWords.slice(0, MAX_WRONG_WORDS);
   const hasMoreWords = stats.wrongWords.length > MAX_WRONG_WORDS;
@@ -42,11 +42,13 @@ function ResultsModal({ stats, onTryAgain, onGenerate }) {
           </div>
         )}
         <div className="action-buttons">
-          <button className="action-button" onClick={onTryAgain}>
-            Restart
-          </button>
+          {!isPracticeMode && (
+            <button className="action-button" onClick={onTryAgain}>
+              Restart
+            </button>
+          )}
           <button className="action-button" onClick={onGenerate}>
-            Generate New Text
+            {isPracticeMode ? 'Reset' : 'Generate New Text'}
           </button>
         </div>
       </div>
@@ -61,7 +63,8 @@ ResultsModal.propTypes = {
     wrongWords: PropTypes.array.isRequired
   }).isRequired,
   onTryAgain: PropTypes.func.isRequired,
-  onGenerate: PropTypes.func.isRequired
+  onGenerate: PropTypes.func.isRequired,
+  isPracticeMode: PropTypes.bool
 }
 
 export default ResultsModal 
