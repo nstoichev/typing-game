@@ -16,7 +16,6 @@ const Practice = () => {
     typedText,
     isComplete,
     stats,
-    handleRestart,
     initializeText,
     countdown,
     setCountdown,
