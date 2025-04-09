@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import words from '../jsons/words.json';
 
 const CHUNK_SIZE = 100;
@@ -19,6 +19,7 @@ export const useTypingGame = () => {
   const [startTime, setStartTime] = useState(null);
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
+  const timerRef = useRef(null);
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -133,10 +134,14 @@ export const useTypingGame = () => {
       setIsActive(true);
       setStartTime(Date.now());
       if (countdown === 60) {
-        const timer = setInterval(() => {
+        // Clear any existing timer
+        if (timerRef.current) {
+          clearInterval(timerRef.current);
+        }
+        timerRef.current = setInterval(() => {
           setCountdown(prev => {
             if (prev <= 0) {
-              clearInterval(timer);
+              clearInterval(timerRef.current);
               return null;
             }
             return prev - 1;
@@ -201,6 +206,11 @@ export const useTypingGame = () => {
   }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete]);
 
   const handleTryAgain = () => {
+    // Clear the timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
     setTypedText('');
     setWrongWords([]);
     setWrongChars(0);
@@ -259,6 +269,12 @@ export const useTypingGame = () => {
   }, [handleKeyDown]);
 
   const initializeText = async () => {
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
     let newText;
     if (textSource === 'wikipedia') {
       newText = await fetchWikipediaText();
@@ -309,6 +325,7 @@ export const useTypingGame = () => {
     initializeText,
     setTextSource,
     isActive,
+    setIsActive,
     countdown,
     setCountdown
   };
