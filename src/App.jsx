@@ -1,5 +1,5 @@
 import './App.css'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
 import Settings from './components/Settings'
 import ActionButtons from './components/ActionButtons'
@@ -9,6 +9,15 @@ import Navigation from './components/Navigation'
 import Practice from './pages/Practice'
 import { useTypingGame } from './hooks/useTypingGame'
 import { useState } from 'react'
+import { AuthProvider } from './contexts/AuthContext'
+import { useAuth } from './contexts/AuthContext'
+import Auth from './components/Auth'
+
+// Protected Route component
+function ProtectedRoute({ children }) {
+  const { currentUser } = useAuth();
+  return currentUser ? children : <Navigate to="/auth" />;
+}
 
 function Home() {
   const [showKeyboard, setShowKeyboard] = useState(true);
@@ -87,13 +96,28 @@ function Home() {
 function App() {
   return (
     <Router>
-      <div className="app-container">
+      <AuthProvider>
         <Navigation />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/practice" element={<Practice />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/practice"
+            element={
+              <ProtectedRoute>
+                <Practice />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
-      </div>
+      </AuthProvider>
     </Router>
   )
 }

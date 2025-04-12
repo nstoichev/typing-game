@@ -1,5 +1,4 @@
 .navigation {
-  background-color: #f8f9fa;
   padding: 1rem;
   margin-bottom: 1rem;
   position: fixed;
@@ -10,31 +9,50 @@
 
 .navigation ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
+  gap: 2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation li a {
+  background-color: #4a90e2;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
   gap: 1rem;
 }
 
-.navigation a {
-  text-decoration: none;
-  color: #333;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
 .navigation a:hover {
-  color: #007bff;
-  background-color: #e9ecef;
+  background-color: #555;
 }
 
 .navigation a.active {
-  color: #fff;
-  background-color: #007bff;
+  background-color: #666;
 }
 
-.navigation a.active:hover {
-  background-color: #0056b3;
+.user-info {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.logout-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+  background-color: #c82333;
 } 
