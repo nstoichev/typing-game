@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Practice.css';
 import ResultsModal from '../components/ResultsModal';
 import Settings from '../components/Settings';
 import ActionButtons from '../components/ActionButtons';
