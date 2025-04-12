@@ -29,12 +29,10 @@ const Practice = () => {
   }, [setCountdown]);
 
   const handleGenerate = () => {
-    console.log('Reset clicked - Current state:', { countdown, isActive });
     // Reset everything
     initializeText();
     setCountdown(60);
     setIsActive(false);
-    console.log('After reset - New state:', { countdown, isActive });
   };
 
   const getNextKey = () => {
@@ -42,14 +40,6 @@ const Practice = () => {
     const typedLength = typedText.length;
     return currentChunk[typedLength] || '';
   };
-
-  useEffect(() => {
-    console.log('Countdown changed:', countdown);
-  }, [countdown]);
-
-  useEffect(() => {
-    console.log('Active state changed:', isActive);
-  }, [isActive]);
 
   return (
     <div className="typing-container">

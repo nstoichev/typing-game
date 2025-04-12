@@ -2,16 +2,16 @@ import React from 'react';
 import styles from './VirtualKeyboard.module.css';
 
 const fingerColors = {
-  leftPinky: '#FF69B4',    // Pink
-  rightPinky: '#FF69B4',   // Pink
-  leftRing: '#FFB6C1',     // Light Pink
-  rightRing: '#FFB6C1',    // Light Pink
-  leftMiddle: '#98FB98',   // Pale Green
-  rightMiddle: '#98FB98',  // Pale Green
-  leftIndex: '#87CEEB',    // Sky Blue
-  rightIndex: '#87CEEB',   // Sky Blue
-  leftThumb: '#DDA0DD',    // Plum
-  rightThumb: '#DDA0DD'    // Plum
+  leftPinky: '#efb430',    // Pink
+  rightPinky: '#efb430',   // Pink
+  leftRing: '#f06e6c',     // Light Pink
+  rightRing: '#f06e6c',    // Light Pink
+  leftMiddle: '#759265',   // Pale Green
+  rightMiddle: '#759265',  // Pale Green
+  leftIndex: '#3b95f2',    // Sky Blue
+  rightIndex: '#495e9d',   // Sky Blue
+  leftThumb: '#999',    // Plum
+  rightThumb: '#999'    // Plum
 };
 
 const getFingerForKey = (key) => {
