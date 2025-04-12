@@ -10,6 +10,8 @@ const Settings = ({
   onToggleKeyboard,
   showFingerLayout,
   onToggleFingerLayout,
+  showHands,
+  onToggleHands,
   hideSourceSelector,
   showSourceSelector = true
 }) => {
@@ -82,18 +84,32 @@ const Settings = ({
             </label>
           </div>
           {showKeyboard && (
-            <div className={styles.settingRow}>
-              <label className={`${styles.settingLabel} ${styles.indented}`}>
-                <input
-                  type="checkbox"
-                  checked={showFingerLayout}
-                  onChange={(e) => onToggleFingerLayout(e.target.checked)}
-                  className={styles.customCheckbox}
-                />
-                <span className={styles.checkmark}></span>
-                Show Fingers Layout
-              </label>
-            </div>
+            <>
+              <div className={styles.settingRow}>
+                <label className={`${styles.settingLabel} ${styles.indented}`}>
+                  <input
+                    type="checkbox"
+                    checked={showFingerLayout}
+                    onChange={(e) => onToggleFingerLayout(e.target.checked)}
+                    className={styles.customCheckbox}
+                  />
+                  <span className={styles.checkmark}></span>
+                  Show Fingers Layout
+                </label>
+              </div>
+              <div className={styles.settingRow}>
+                <label className={`${styles.settingLabel} ${styles.indented}`}>
+                  <input
+                    type="checkbox"
+                    checked={showHands}
+                    onChange={(e) => onToggleHands(e.target.checked)}
+                    className={styles.customCheckbox}
+                  />
+                  <span className={styles.checkmark}></span>
+                  Show Virtual Hands
+                </label>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -108,6 +124,8 @@ Settings.propTypes = {
   onToggleKeyboard: PropTypes.func.isRequired,
   showFingerLayout: PropTypes.bool.isRequired,
   onToggleFingerLayout: PropTypes.func.isRequired,
+  showHands: PropTypes.bool.isRequired,
+  onToggleHands: PropTypes.func.isRequired,
   hideSourceSelector: PropTypes.bool,
   showSourceSelector: PropTypes.bool
 };

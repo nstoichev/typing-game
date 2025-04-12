@@ -10,6 +10,7 @@ import { useTypingGame } from '../hooks/useTypingGame';
 const Practice = () => {
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [showFingerLayout, setShowFingerLayout] = useState(false);
+  const [showHands, setShowHands] = useState(false);
   const {
     currentChunk,
     nextChunk,
@@ -48,6 +49,8 @@ const Practice = () => {
         onToggleKeyboard={setShowKeyboard}
         showFingerLayout={showFingerLayout}
         onToggleFingerLayout={setShowFingerLayout}
+        showHands={showHands}
+        onToggleHands={setShowHands}
         hideSourceSelector={true}
         showSourceSelector={false}
       />
@@ -63,6 +66,7 @@ const Practice = () => {
         <VirtualKeyboard 
           nextKey={getNextKey()} 
           showFingerLayout={showFingerLayout}
+          showHands={showHands}
         />
       )}
       <ActionButtons

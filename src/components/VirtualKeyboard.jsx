@@ -1,5 +1,7 @@
 import React from 'react';
 import styles from './VirtualKeyboard.module.css';
+import VirtualHands from './VirtualHands';
+import PropTypes from 'prop-types';
 
 const fingerColors = {
   leftPinky: '#efb430',    // Pink
@@ -96,7 +98,7 @@ const getFingerForKey = (key) => {
   return fingerMap[key] || null;
 };
 
-const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
+const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands }) => {
   // Helper function to determine which Shift key to highlight
   const getShiftSide = (letter) => {
     const leftHandKeys = 'qwertasdfgzxcvb1234567';
@@ -225,6 +227,7 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
 
   return (
     <div className={styles.keyboard}>
+      <VirtualHands nextKey={nextKey} showHands={showHands} />
       {keyboardLayout.map((row, rowIndex) => (
         <div key={rowIndex} className={styles.keyboardRow}>
           {row.map((keyObj) => {
@@ -250,8 +253,9 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
                     ))}
                   </div>
                 ) : (
-                  <span className={styles.singleChar}>{primary}</span>
+                  primary
                 )}
+                {secondary && <span className={styles.secondaryChar}>{secondary}</span>}
               </div>
             );
           })}
@@ -259,6 +263,12 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout }) => {
       ))}
     </div>
   );
+};
+
+VirtualKeyboard.propTypes = {
+  nextKey: PropTypes.string,
+  showFingerLayout: PropTypes.bool.isRequired,
+  showHands: PropTypes.bool.isRequired
 };
 
 export default VirtualKeyboard; 

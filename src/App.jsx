@@ -13,6 +13,7 @@ import { useState } from 'react'
 function Home() {
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [showFingerLayout, setShowFingerLayout] = useState(false);
+  const [showHands, setShowHands] = useState(false);
   const {
     currentChunk,
     nextChunk,
@@ -51,6 +52,8 @@ function Home() {
         onToggleKeyboard={setShowKeyboard}
         showFingerLayout={showFingerLayout}
         onToggleFingerLayout={setShowFingerLayout}
+        showHands={showHands}
+        onToggleHands={setShowHands}
         hideSourceSelector={countdown !== null}
       />
       {countdown !== null && (
@@ -67,6 +70,7 @@ function Home() {
         <VirtualKeyboard 
           nextKey={getNextKey()} 
           showFingerLayout={showFingerLayout}
+          showHands={showHands}
         />
       )}
       <ActionButtons
