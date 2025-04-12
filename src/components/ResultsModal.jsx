@@ -1,10 +1,24 @@
-import PropTypes from 'prop-types'
-import './ResultsModal.css'
+import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import PropTypes from 'prop-types';
+import './ResultsModal.css';
 
-function ResultsModal({ stats, onTryAgain, onGenerate, isPracticeMode = false }) {
+const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false }) => {
+  const { saveTestResults } = useAuth();
   const MAX_WRONG_WORDS = 20;
   const wrongWords = stats.wrongWords.slice(0, MAX_WRONG_WORDS);
   const hasMoreWords = stats.wrongWords.length > MAX_WRONG_WORDS;
+  const hasSavedRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (stats && !hasSavedRef.current) {
+      hasSavedRef.current = true;
+      saveTestResults(stats).catch(error => {
+        console.error('Failed to save test results:', error);
+        hasSavedRef.current = false; // Reset the flag if save fails
+      });
+    }
+  }, [stats, saveTestResults]);
 
   return (
     <div className="modal-overlay">
@@ -12,11 +26,11 @@ function ResultsModal({ stats, onTryAgain, onGenerate, isPracticeMode = false })
         <h2>Typing Results</h2>
         <div className="stats-grid">
           <div className="stat-item">
-            <div className="stat-value">{stats.wpm}</div>
+            <div className="stat-value">{stats?.wpm || 0}</div>
             <div className="stat-label">WPM</div>
           </div>
           <div className="stat-item">
-            <div className="stat-value">{stats.accuracy}%</div>
+            <div className="stat-value">{stats?.accuracy?.toFixed(1) || 0}%</div>
             <div className="stat-label">Accuracy</div>
           </div>
           <div className="stat-item">
@@ -53,18 +67,18 @@ function ResultsModal({ stats, onTryAgain, onGenerate, isPracticeMode = false })
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 ResultsModal.propTypes = {
   stats: PropTypes.shape({
-    wpm: PropTypes.number.isRequired,
-    accuracy: PropTypes.number.isRequired,
+    wpm: PropTypes.number,
+    accuracy: PropTypes.number,
     wrongWords: PropTypes.array.isRequired
   }).isRequired,
   onTryAgain: PropTypes.func.isRequired,
   onGenerate: PropTypes.func.isRequired,
   isPracticeMode: PropTypes.bool
-}
+};
 
-export default ResultsModal 
+export default ResultsModal; 

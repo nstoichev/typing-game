@@ -7,6 +7,7 @@ import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
 import Navigation from './components/Navigation'
 import Practice from './pages/Practice'
+import Account from './pages/Account'
 import { useTypingGame } from './hooks/useTypingGame'
 import { useState } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
@@ -113,6 +114,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Practice />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
               </ProtectedRoute>
             }
           />

@@ -10,7 +10,8 @@
 .navigation ul {
   list-style: none;
   display: flex;
-  gap: 2rem;
+  flex-flow: column wrap;
+  gap: 1rem 2rem;
   margin: 0;
   padding: 0;
 }
