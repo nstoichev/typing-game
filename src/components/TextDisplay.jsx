@@ -1,7 +1,11 @@
 import React from 'react';
 import styles from './TextDisplay.module.css';
+import { useAuth } from '../contexts/AuthContext';
 
 const TextDisplay = ({ currentChunk, nextChunk, typedText }) => {
+  const { userData } = useAuth();
+  const highlightMode = userData?.highlightMode || 'letters';
+
   const renderText = (text, isPreview = false) => {
     if (isPreview) {
       // Split text into words and render each word
@@ -68,7 +72,7 @@ const TextDisplay = ({ currentChunk, nextChunk, typedText }) => {
 
   return (
     <>
-      <div className={styles['text-display']}>
+      <div className={`${styles['text-display']} ${styles[`highlight-${highlightMode}`]}`}>
         {renderText(currentChunk)}
       </div>
       {nextChunk && (

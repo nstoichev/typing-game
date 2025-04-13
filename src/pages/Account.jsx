@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import css from './Account.module.css';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 
 const Account = () => {
@@ -39,6 +39,24 @@ const Account = () => {
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handleHighlightModeChange = async (mode) => {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        highlightMode: mode
+      });
+      
+      setUserData(prev => ({
+        ...prev,
+        highlightMode: mode
+      }));
+    } catch (error) {
+      console.error('Error updating highlight mode:', error);
+    }
   };
 
   if (isLoading) {
@@ -149,6 +167,31 @@ const Account = () => {
                 <div className={css['preference-item']}>
                   <span className={css['preference-label']}>Keyboard Layout</span>
                   <span className={css['preference-value']}>QWERTY</span>
+                </div>
+                <div className={css['preference-item']}>
+                  <span className={css['preference-label']}>Highlight Mode</span>
+                  <div className={css['radio-group']}>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="highlightMode"
+                        value="letters"
+                        checked={userData?.highlightMode === 'words' ? false : true}
+                        onChange={(e) => handleHighlightModeChange('letters')}
+                      />
+                      Letters
+                    </label>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="highlightMode"
+                        value="words"
+                        checked={userData?.highlightMode === 'words'}
+                        onChange={(e) => handleHighlightModeChange('words')}
+                      />
+                      Words
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
