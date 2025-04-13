@@ -35,8 +35,7 @@ function Home() {
     handleTryAgain,
     initializeText,
     setTextSource,
-    countdown,
-    setCountdown
+    countdown
   } = useTypingGame()
 
   const handleSourceChange = (source) => {

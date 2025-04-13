@@ -19,7 +19,6 @@ const Practice = () => {
     initializeText,
     countdown,
     setCountdown,
-    isActive,
     setIsActive
   } = useTypingGame('random');
 

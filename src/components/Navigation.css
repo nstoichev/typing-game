@@ -5,12 +5,13 @@
   top: 0;
   left: 0;
   z-index: 1000;
+  width: calc(100% - 4rem);
 }
 
 .navigation ul {
   list-style: none;
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: row wrap;
   gap: 1rem 2rem;
   margin: 0;
   padding: 0;
@@ -41,7 +42,6 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
 }
 
 .logout-button {
@@ -56,4 +56,46 @@
 
 .logout-button:hover {
   background-color: #c82333;
+}
+
+.settings-container {
+  display: flex;
+  align-items: center;
+}
+
+.settings-container :global(.settingsContainer) {
+  position: relative;
+}
+
+.settings-container :global(.settingsPanel) {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  min-width: 200px;
+  z-index: 1001;
+}
+
+.settings-container :global(.settingsButton) {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-container :global(.gearIcon) {
+  width: 24px;
+  height: 24px;
+  color: #4a90e2;
+}
+
+.settings-container :global(.rotate) {
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
 } 

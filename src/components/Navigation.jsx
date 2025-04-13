@@ -19,18 +19,14 @@ const Navigation = () => {
   return (
     <nav className="navigation">
       <ul>
-      {currentUser && (
+        <li><NavLink to="/" end>Freestyle</NavLink></li>
+        <li><NavLink to="/practice">Speed test</NavLink></li> 
+        {currentUser && (
           <>
             <li className="user-info">
               <span>Welcome, {currentUser.displayName || currentUser.email}</span>
               <button onClick={handleLogout} className="logout-button">Logout</button>
-            </li>
-          </>
-        )}
-        <li><NavLink to="/" end>Freestyle</NavLink></li>
-        <li><NavLink to="/practice">Speed test</NavLink></li>
-        {currentUser && (
-          <>
+            </li>          
             <li><NavLink to="/account">Account</NavLink></li>
           </>
         )}
