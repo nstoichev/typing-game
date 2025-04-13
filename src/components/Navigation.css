@@ -46,6 +46,12 @@
   gap: 1rem;
 }
 
+.user-name {
+  color: #ecf0f1;
+  font-weight: 500;
+  padding: 0.5rem;
+}
+
 .account-link {
   color: #ecf0f1;
   text-decoration: none;
@@ -84,6 +90,31 @@
 
 .login-button:hover {
   background-color: #219a52;
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #34495e;
+  padding: 0.5rem;
+  border-radius: 4px;
+  color: #ecf0f1;
+}
+
+.disable-team-button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background-color 0.2s;
+}
+
+.disable-team-button:hover {
+  background-color: #c0392b;
 }
 
 .settings-container {
@@ -176,28 +207,4 @@
 
 .checkbox-container input[type="checkbox"]:checked + .checkmark:after {
   display: block;
-}
-
-.team-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background-color: #34495e;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-
-.disable-team-button {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  transition: background-color 0.2s;
-}
-
-.disable-team-button:hover {
-  background-color: #c0392b;
 } 

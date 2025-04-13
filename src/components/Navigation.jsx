@@ -72,6 +72,17 @@ const Navigation = ({
         <div className="user-info">
           {currentUser ? (
             <>
+              <span className="user-name">
+                {currentUser.displayName || currentUser.email}
+              </span>
+              {currentTeam && (
+                <div className="team-info">
+                  <span>Team: {currentTeam.name}</span>
+                  <button onClick={handleDisableTeam} className="disable-team-button">
+                    Disable Team
+                  </button>
+                </div>
+              )}
               <Link to="/account" className="account-link">
                 Account
               </Link>
