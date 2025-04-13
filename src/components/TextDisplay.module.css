@@ -28,6 +28,9 @@
   height: 40px;
   overflow: hidden;
   box-sizing: border-box;
+  position: absolute;
+  top: 260px;
+  left: 0;
 }
 
 .text-preview .word {

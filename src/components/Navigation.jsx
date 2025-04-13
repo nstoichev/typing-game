@@ -1,6 +1,7 @@
 import React from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTeams } from '../contexts/TeamsContext';
 import Settings from './Settings';
 import './Navigation.css';
 
@@ -16,6 +17,7 @@ const Navigation = ({
   hideSourceSelector
 }) => {
   const { currentUser, logout } = useAuth();
+  const { currentTeam, setCurrentTeam } = useTeams();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,39 +30,75 @@ const Navigation = ({
     }
   };
 
+  const handleDisableTeam = () => {
+    setCurrentTeam(null);
+  };
+
   // Determine if we're on the practice page
   const isPracticePage = location.pathname === '/practice';
 
   return (
     <nav className="navigation">
       <ul>
-        <li><NavLink to="/" end>Freestyle</NavLink></li>
-        <li><NavLink to="/practice">Speed test</NavLink></li> 
-        {currentUser && (
-          <>
-            <li className="user-info">
-              <span>Welcome, {currentUser.displayName || currentUser.email}</span>
-              <button onClick={handleLogout} className="logout-button">Logout</button>
-            </li>          
-            <li><NavLink to="/account">Account</NavLink></li>
-          </>
-        )}
-        
         <li>
-          <Settings 
-            onSourceChange={onSourceChange}
-            currentSource={currentSource}
-            showKeyboard={showKeyboard}
-            onToggleKeyboard={onToggleKeyboard}
-            showFingerLayout={showFingerLayout}
-            onToggleFingerLayout={onToggleFingerLayout}
-            showHands={showHands}
-            onToggleHands={onToggleHands}
-            hideSourceSelector={hideSourceSelector}
-            showSourceSelector={!isPracticePage}
-          />
+          <Link 
+            to="/" 
+            className={location.pathname === '/' ? 'active' : ''}
+          >
+            Freestyle
+          </Link>
         </li>
+        <li>
+          <Link 
+            to="/practice" 
+            className={location.pathname === '/practice' ? 'active' : ''}
+          >
+            Speed test
+          </Link>
+        </li>
+        {currentUser && (
+          <li>
+            <Link 
+              to="/teams" 
+              className={location.pathname === '/teams' ? 'active' : ''}
+            >
+              Teams
+            </Link>
+          </li>
+        )}
       </ul>
+
+      <div className="right-container">
+        <div className="user-info">
+          {currentUser ? (
+            <>
+              <Link to="/account" className="account-link">
+                Account
+              </Link>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/auth" className="login-button">
+              Login
+            </Link>
+          )}
+        </div>
+
+        <Settings
+          onSourceChange={onSourceChange}
+          currentSource={currentSource}
+          showKeyboard={showKeyboard}
+          onToggleKeyboard={onToggleKeyboard}
+          showFingerLayout={showFingerLayout}
+          onToggleFingerLayout={onToggleFingerLayout}
+          showHands={showHands}
+          onToggleHands={onToggleHands}
+          hideSourceSelector={hideSourceSelector}
+          showSourceSelector={!isPracticePage}
+        />
+      </div>
     </nav>
   );
 };
