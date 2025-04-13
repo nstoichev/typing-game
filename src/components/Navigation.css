@@ -5,14 +5,14 @@
   top: 0;
   left: 0;
   z-index: 1000;
-  width: calc(100% - 4rem);
+  width: 100%;
 }
 
 .navigation ul {
   list-style: none;
   display: flex;
   flex-flow: row wrap;
-  gap: 1rem 2rem;
+  gap: 1rem;
   margin: 0;
   padding: 0;
 }

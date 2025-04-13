@@ -1,7 +1,6 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
-import Settings from './components/Settings'
 import ActionButtons from './components/ActionButtons'
 import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
@@ -20,32 +19,20 @@ function ProtectedRoute({ children }) {
   return currentUser ? children : <Navigate to="/auth" />;
 }
 
-function Home() {
-  const [showKeyboard, setShowKeyboard] = useState(true);
-  const [showFingerLayout, setShowFingerLayout] = useState(false);
-  const [showHands, setShowHands] = useState(false);
-  const {
-    currentChunk,
-    nextChunk,
-    typedText,
-    isComplete,
-    stats,
-    textSource,
-    handleRestart,
-    handleTryAgain,
-    initializeText,
-    setTextSource,
-    countdown
-  } = useTypingGame()
-
-  const handleSourceChange = (source) => {
-    setTextSource(source)
-  }
-
-  const handleGenerate = () => {
-    initializeText()
-  }
-
+function Home({ 
+  showKeyboard, 
+  showFingerLayout, 
+  showHands, 
+  currentChunk, 
+  nextChunk, 
+  typedText, 
+  isComplete, 
+  stats, 
+  handleRestart, 
+  handleTryAgain, 
+  initializeText, 
+  countdown 
+}) {
   const getNextKey = () => {
     if (!currentChunk) return '';
     const typedLength = typedText.length;
@@ -54,17 +41,6 @@ function Home() {
 
   return (
     <div className="typing-container">
-      <Settings 
-        onSourceChange={handleSourceChange}
-        currentSource={textSource}
-        showKeyboard={showKeyboard}
-        onToggleKeyboard={setShowKeyboard}
-        showFingerLayout={showFingerLayout}
-        onToggleFingerLayout={setShowFingerLayout}
-        showHands={showHands}
-        onToggleHands={setShowHands}
-        hideSourceSelector={countdown !== null}
-      />
       {countdown !== null && (
         <div className="countdown-display">
           {countdown === 60 ? 'Start typing!' : `${countdown} seconds`}
@@ -84,27 +60,72 @@ function Home() {
       )}
       <ActionButtons
         onRestart={handleRestart}
-        onGenerate={handleGenerate}
+        onGenerate={initializeText}
       />
       {isComplete && stats && (
-        <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={handleGenerate} />
+        <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={initializeText} />
       )}
     </div>
   )
 }
 
 function App() {
+  const [showKeyboard, setShowKeyboard] = useState(true);
+  const [showFingerLayout, setShowFingerLayout] = useState(false);
+  const [showHands, setShowHands] = useState(false);
+  
+  const {
+    currentChunk,
+    nextChunk,
+    typedText,
+    isComplete,
+    stats,
+    textSource,
+    handleRestart,
+    handleTryAgain,
+    initializeText,
+    setTextSource,
+    countdown
+  } = useTypingGame();
+
+  const handleSourceChange = (source) => {
+    setTextSource(source);
+  };
+
   return (
     <Router>
       <AuthProvider>
-        <Navigation />
+        <Navigation 
+          onSourceChange={handleSourceChange}
+          currentSource={textSource}
+          showKeyboard={showKeyboard}
+          onToggleKeyboard={setShowKeyboard}
+          showFingerLayout={showFingerLayout}
+          onToggleFingerLayout={setShowFingerLayout}
+          showHands={showHands}
+          onToggleHands={setShowHands}
+          hideSourceSelector={countdown !== null}
+        />
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <Home />
+                <Home 
+                  showKeyboard={showKeyboard}
+                  showFingerLayout={showFingerLayout}
+                  showHands={showHands}
+                  currentChunk={currentChunk}
+                  nextChunk={nextChunk}
+                  typedText={typedText}
+                  isComplete={isComplete}
+                  stats={stats}
+                  handleRestart={handleRestart}
+                  handleTryAgain={handleTryAgain}
+                  initializeText={initializeText}
+                  countdown={countdown}
+                />
               </ProtectedRoute>
             }
           />
@@ -112,7 +133,11 @@ function App() {
             path="/practice"
             element={
               <ProtectedRoute>
-                <Practice />
+                <Practice 
+                  showKeyboard={showKeyboard}
+                  showFingerLayout={showFingerLayout}
+                  showHands={showHands}
+                />
               </ProtectedRoute>
             }
           />

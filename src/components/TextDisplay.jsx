@@ -27,8 +27,12 @@ const TextDisplay = ({ currentChunk, nextChunk, typedText }) => {
       const spaceChar = wordIndex < words.length - 1 ? ' ' : '';
       const chars = (word + spaceChar).split('');
       
+      // Check if this is the current word
+      const isCurrentWord = typedText.length >= wordStart && 
+                           typedText.length < wordStart + wordLength;
+      
       const wordElement = (
-        <span key={wordIndex} className={styles.word}>
+        <span key={wordIndex} className={`${styles.word} ${isCurrentWord ? styles.active : ''}`}>
           {chars.map((char, charIndex) => {
             const absoluteIndex = wordStart + charIndex;
             const isTyped = absoluteIndex < typedText.length;

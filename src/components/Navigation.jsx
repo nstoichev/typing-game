@@ -1,11 +1,23 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import Settings from './Settings';
 import './Navigation.css';
 
-const Navigation = () => {
+const Navigation = ({ 
+  onSourceChange,
+  currentSource,
+  showKeyboard,
+  onToggleKeyboard,
+  showFingerLayout,
+  onToggleFingerLayout,
+  showHands,
+  onToggleHands,
+  hideSourceSelector
+}) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = async () => {
     try {
@@ -15,6 +27,9 @@ const Navigation = () => {
       console.error('Logout error:', error);
     }
   };
+
+  // Determine if we're on the practice page
+  const isPracticePage = location.pathname === '/practice';
 
   return (
     <nav className="navigation">
@@ -30,6 +45,21 @@ const Navigation = () => {
             <li><NavLink to="/account">Account</NavLink></li>
           </>
         )}
+        
+        <li>
+          <Settings 
+            onSourceChange={onSourceChange}
+            currentSource={currentSource}
+            showKeyboard={showKeyboard}
+            onToggleKeyboard={onToggleKeyboard}
+            showFingerLayout={showFingerLayout}
+            onToggleFingerLayout={onToggleFingerLayout}
+            showHands={showHands}
+            onToggleHands={onToggleHands}
+            hideSourceSelector={hideSourceSelector}
+            showSourceSelector={!isPracticePage}
+          />
+        </li>
       </ul>
     </nav>
   );

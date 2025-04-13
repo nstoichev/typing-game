@@ -1,15 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import ResultsModal from '../components/ResultsModal';
-import Settings from '../components/Settings';
 import ActionButtons from '../components/ActionButtons';
 import TextDisplay from '../components/TextDisplay';
 import VirtualKeyboard from '../components/VirtualKeyboard';
 import { useTypingGame } from '../hooks/useTypingGame';
 
-const Practice = () => {
-  const [showKeyboard, setShowKeyboard] = useState(true);
-  const [showFingerLayout, setShowFingerLayout] = useState(false);
-  const [showHands, setShowHands] = useState(false);
+const Practice = ({ showKeyboard, showFingerLayout, showHands }) => {
   const {
     currentChunk,
     nextChunk,
@@ -42,16 +38,6 @@ const Practice = () => {
 
   return (
     <div className="typing-container">
-      <Settings 
-        showKeyboard={showKeyboard}
-        onToggleKeyboard={setShowKeyboard}
-        showFingerLayout={showFingerLayout}
-        onToggleFingerLayout={setShowFingerLayout}
-        showHands={showHands}
-        onToggleHands={setShowHands}
-        hideSourceSelector={true}
-        showSourceSelector={false}
-      />
       <div className="countdown-display">
         {countdown === 60 ? 'Start typing!' : countdown > 0 ? `${countdown} seconds` : 'Time\'s up!'}
       </div>
