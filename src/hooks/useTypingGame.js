@@ -5,6 +5,19 @@ const CHUNK_SIZE = 100;
 const CHUNK_BUFFER = 20;
 const MAX_WIKI_ATTEMPTS = 5;
 
+// List of valid typing keys
+const VALID_TYPING_KEYS = new Set([
+  // Letters
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+  // Numbers
+  '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  // Punctuation and special characters
+  ' ', ',', '.', ';', "'", '"', '!', '?', '-', '_', '=', '+',
+  '[', ']', '{', '}', '\\', '|', '`', '~', '@', '#', '$', '%',
+  '^', '&', '*', '(', ')', '/', '<', '>'
+]);
+
 export const useTypingGame = () => {
   const [text, setText] = useState('');
   const [currentChunk, setCurrentChunk] = useState('');
@@ -130,7 +143,10 @@ export const useTypingGame = () => {
       return;
     }
 
-    if (!isActive) {
+    // Check if the key is a valid typing key
+    const isValidTypingKey = VALID_TYPING_KEYS.has(e.key.toLowerCase()) || e.key === 'Backspace';
+
+    if (!isActive && isValidTypingKey) {
       setIsActive(true);
       setStartTime(Date.now());
       if (countdown === 60) {
@@ -148,6 +164,11 @@ export const useTypingGame = () => {
           });
         }, 1000);
       }
+    }
+
+    // Only process the key if it's a valid typing key
+    if (!isValidTypingKey) {
+      return;
     }
 
     if (e.key === 'Backspace') {
