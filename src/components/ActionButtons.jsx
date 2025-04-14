@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './ActionButtons.module.css';
 
-const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false }) => {
+const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false, isLoading = false }) => {
   const handleMouseUp = (e) => {
     e.target.blur();
   };
@@ -14,6 +14,7 @@ const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false }) => {
           className={styles.button} 
           onClick={onRestart}
           onMouseUp={handleMouseUp}
+          disabled={isLoading}
         >
           Restart
         </button>
@@ -22,6 +23,7 @@ const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false }) => {
         className={styles.button} 
         onClick={onGenerate}
         onMouseUp={handleMouseUp}
+        disabled={isLoading}
       >
         {isPracticeMode ? 'Reset' : 'Generate New Text'}
       </button>
@@ -32,7 +34,8 @@ const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false }) => {
 ActionButtons.propTypes = {
   onRestart: PropTypes.func,
   onGenerate: PropTypes.func.isRequired,
-  isPracticeMode: PropTypes.bool
+  isPracticeMode: PropTypes.bool,
+  isLoading: PropTypes.bool
 };
 
 export default ActionButtons; 

@@ -38,6 +38,7 @@ export const useTypingGame = () => {
   const [startTime, setStartTime] = useState(null);
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef(null);
 
   const isValidText = (text) => {
@@ -312,41 +313,17 @@ export const useTypingGame = () => {
   }, [handleKeyDown]);
 
   const initializeText = async () => {
+    setIsLoading(true);
     // Clear any existing timer
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
 
-    let newText;
-    if (textSource === 'wikipedia') {
-      newText = await fetchWikipediaText();
-    } else {
-      newText = generateRandomText();
-    }
-        
-    // For countdown mode, generate more initial text
-    if (countdown !== null) {
-      const additionalText = generateMoreText();
-      newText = newText + ' ' + additionalText;
-    }
-    
-    setText(newText);
-    const firstChunk = getChunkWithWordBoundary(newText, 0);
-    setCurrentChunk(firstChunk.chunk);
-    
-    // Ensure we have enough text for preview in countdown mode
-    if (countdown !== null) {
-      const updatedText = ensurePreviewText(newText, firstChunk.endIndex);
-      if (updatedText !== newText) {
-        setText(updatedText);
-        newText = updatedText;
-      }
-    }
-    
-    const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
-    setNextChunk(secondChunk.chunk);
-    setCurrentChunkStartIndex(0);
+    // Clear existing text while loading
+    setText('');
+    setCurrentChunk('');
+    setNextChunk('');
     setTypedText('');
     setWrongWords([]);
     setWrongChars(0);
@@ -354,6 +331,42 @@ export const useTypingGame = () => {
     setIsActive(false);
     setStats(null);
     setStartTime(null);
+
+    try {
+      let newText;
+      if (textSource === 'wikipedia') {
+        newText = await fetchWikipediaText();
+      } else {
+        newText = generateRandomText();
+      }
+          
+      // For countdown mode, generate more initial text
+      if (countdown !== null) {
+        const additionalText = generateMoreText();
+        newText = newText + ' ' + additionalText;
+      }
+      
+      setText(newText);
+      const firstChunk = getChunkWithWordBoundary(newText, 0);
+      setCurrentChunk(firstChunk.chunk);
+      
+      // Ensure we have enough text for preview in countdown mode
+      if (countdown !== null) {
+        const updatedText = ensurePreviewText(newText, firstChunk.endIndex);
+        if (updatedText !== newText) {
+          setText(updatedText);
+          newText = updatedText;
+        }
+      }
+      
+      const secondChunk = getChunkWithWordBoundary(newText, firstChunk.endIndex);
+      setNextChunk(secondChunk.chunk);
+      setCurrentChunkStartIndex(0);
+    } catch (error) {
+      console.error('Error initializing text:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
@@ -370,6 +383,7 @@ export const useTypingGame = () => {
     isActive,
     setIsActive,
     countdown,
-    setCountdown
+    setCountdown,
+    isLoading
   };
 }; 

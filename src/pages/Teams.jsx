@@ -118,7 +118,7 @@ const Teams = () => {
           teams.map(team => (
             <div 
               key={team.id} 
-              className={`${styles.teamCard} ${currentTeam?.id === team.id ? styles.selected : ''}`}
+              className={`${styles.teamCard} ${currentTeam?.id === team.id ? styles.active : ''}`}
               onClick={() => handleSelectTeam(team)}
             >
               <div className={styles.teamHeader}>

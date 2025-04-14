@@ -97,7 +97,8 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
     handleTryAgain,
     initializeText,
     setTextSource,
-    countdown
+    countdown,
+    isLoading
   } = useTypingGame();
 
   useEffect(() => {
@@ -121,6 +122,7 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
         currentChunk={currentChunk}
         nextChunk={nextChunk}
         typedText={typedText}
+        isLoading={isLoading}
       />
       {showKeyboard && (
         <VirtualKeyboard 
@@ -132,6 +134,7 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
       <ActionButtons
         onRestart={handleRestart}
         onGenerate={initializeText}
+        isLoading={isLoading}
       />
       {isComplete && stats && (
         <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={initializeText} />

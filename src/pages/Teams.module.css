@@ -84,12 +84,20 @@
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.teamCard.active {
+  box-shadow: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);
+  background: #f8f9fa;
 }
 
 .teamHeader {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 1rem;
 }
 
@@ -104,6 +112,13 @@
   gap: 0.5rem;
   font-size: 0.9rem;
   color: #666;
+}
+
+.teamId span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .copyButton {
