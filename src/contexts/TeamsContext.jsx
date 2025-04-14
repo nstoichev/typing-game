@@ -29,24 +29,31 @@ export function TeamsProvider({ children }) {
   // Function to get user display name
   const getUserDisplayName = async (userId) => {
     try {
-      // First try to get from Firebase Auth
+      console.log('Fetching display name for user:', userId);
+      
+      // First try to get from Firebase Auth for current user
       const user = auth.currentUser;
       
       if (user && user.uid === userId) {
+        console.log('Found current user in Auth:', user.displayName || user.email);
         return user.displayName || user.email || 'Unknown';
       }
 
-      // If not in Auth, try Firestore
+      // For other users, try Firestore
       const userRef = doc(db, 'users', userId);
+      console.log('Attempting to fetch from Firestore...');
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (userData && typeof userData.displayName === 'string') {
-          return userData.displayName;
-        }
+        console.log('Found user in Firestore:', userData);
+        // Return displayName if it exists, otherwise try email or fallback to Unknown
+        const displayName = userData.displayName || userData.email || 'Unknown';
+        console.log('Returning display name:', displayName);
+        return displayName;
       }
 
+      console.log('User not found in Firestore');
       return 'Unknown';
     } catch (error) {
       console.error('Error fetching user display name:', error);
@@ -120,7 +127,6 @@ export function TeamsProvider({ children }) {
           })
         });
 
-        // Fetch updated teams list immediately after joining
         await fetchUserTeams();
       }
     } catch (error) {
@@ -219,36 +225,33 @@ export function TeamsProvider({ children }) {
         }
 
         // Convert members array to proper format with stats and names
-        const members = await Promise.all(
-          Array.isArray(teamData.members) 
-            ? teamData.members.map(async member => {
-                const userId = typeof member === 'string' ? member : member.id;
-                
-                // If member is an object, use its existing stats
-                const existingStats = typeof member === 'object' ? {
-                  bestWPM: member.bestWPM || 0,
-                  totalTests: member.totalTests || 0,
-                  averageWPM: member.averageWPM || 0
-                } : null;
+        const members = Array.isArray(teamData.members) 
+          ? teamData.members.map(member => {
+              const userId = typeof member === 'string' ? member : member.id;
+              
+              // If member is an object, use its existing stats
+              const existingStats = typeof member === 'object' ? {
+                bestWPM: member.bestWPM || 0,
+                totalTests: member.totalTests || 0,
+                averageWPM: member.averageWPM || 0
+              } : null;
 
-                // Use existing stats if available, otherwise calculate from recentTests
-                const stats = existingStats || memberStats[userId] || {
-                  totalTests: 0,
-                  totalWPM: 0,
-                  bestWPM: 0
-                };
+              // Use existing stats if available, otherwise calculate from recentTests
+              const stats = existingStats || memberStats[userId] || {
+                totalTests: 0,
+                totalWPM: 0,
+                bestWPM: 0
+              };
 
-                const displayName = await getUserDisplayName(userId);
-                return {
-                  id: userId,
-                  name: displayName,
-                  bestWPM: stats.bestWPM,
-                  totalTests: stats.totalTests,
-                  averageWPM: stats.averageWPM || (stats.totalTests > 0 ? stats.totalWPM / stats.totalTests : 0)
-                };
-              })
-            : []
-        );
+              return {
+                id: userId,
+                name: member.name || 'Unknown',
+                bestWPM: stats.bestWPM,
+                totalTests: stats.totalTests,
+                averageWPM: stats.averageWPM || (stats.totalTests > 0 ? stats.totalWPM / stats.totalTests : 0)
+              };
+            })
+          : [];
 
         // Calculate team stats from members
         const teamStats = members.reduce((acc, member) => {
@@ -285,8 +288,8 @@ export function TeamsProvider({ children }) {
       setTeams(filteredTeams);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching teams:', error);
       setLoading(false);
+      throw error;
     }
   };
 
