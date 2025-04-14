@@ -41,6 +41,20 @@ export function AuthProvider({ children }) {
       await updateProfile(userCredential.user, {
         displayName: displayName
       });
+
+      // Create a user document in Firestore
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      await setDoc(userRef, {
+        displayName: displayName,
+        email: email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        totalTests: 0,
+        averageWPM: 0,
+        bestWPM: 0,
+        averageAccuracy: 0,
+        recentTests: []
+      });
       
       return userCredential;
     } catch (error) {
@@ -82,7 +96,7 @@ export function AuthProvider({ children }) {
   }
 
   // Function to save test results
-  async function saveTestResults(stats) {
+  async function saveTestResults(stats, teamId = null) {
     if (!currentUser) return;
     
     try {
@@ -92,7 +106,8 @@ export function AuthProvider({ children }) {
       const testData = {
         wpm: stats.wpm,
         accuracy: stats.accuracy,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        teamId: teamId
       };
 
       // Check if this exact test result was already saved in the last minute
@@ -106,7 +121,6 @@ export function AuthProvider({ children }) {
           now - lastTestTime < 60000 && // Less than 1 minute ago
           lastTest.wpm === testData.wpm && 
           lastTest.accuracy === testData.accuracy) {
-        console.log('Duplicate test result detected, skipping save');
         return;
       }
 
@@ -145,9 +159,7 @@ export function AuthProvider({ children }) {
         averageWPM: ((prev?.averageWPM || 0) * (prev?.totalTests || 0) + stats.wpm) / ((prev?.totalTests || 0) + 1),
         averageAccuracy: ((prev?.averageAccuracy || 0) * (prev?.totalTests || 0) + stats.accuracy) / ((prev?.totalTests || 0) + 1),
         recentTests: [...(prev?.recentTests || []), testData].slice(-5) // Keep only last 5 tests
-      }));
-      
-      console.log('Test results saved:', stats);
+      }));      
     } catch (error) {
       console.error('Error saving test results:', error);
       throw error;
@@ -165,7 +177,6 @@ export function AuthProvider({ children }) {
       if (userDoc.exists()) {
         const data = userDoc.data();
         setUserData(data);
-        console.log('User data loaded:', data);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -173,12 +184,23 @@ export function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    console.log('Setting up auth state listener');
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user ? `User logged in: ${user.displayName || user.email}` : 'No user');
       setCurrentUser(user);
       if (user) {
-        await getUserData();
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userRef);
+          
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            setUserData(data);
+          } else {
+            setUserData(null);
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error);
+          setUserData(null);
+        }
       } else {
         setUserData(null);
       }
@@ -186,7 +208,6 @@ export function AuthProvider({ children }) {
     });
 
     return () => {
-      console.log('Cleaning up auth state listener');
       unsubscribe();
     };
   }, []);

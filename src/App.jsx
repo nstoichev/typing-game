@@ -9,11 +9,12 @@ import Practice from './pages/Practice'
 import Account from './pages/Account'
 import Teams from './pages/Teams'
 import { useTypingGame } from './hooks/useTypingGame'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TeamsProvider } from './contexts/TeamsContext'
 import Auth from './components/Auth'
 import TeamStatsUpdater from './components/TeamStatsUpdater'
+import SourceSelector from './components/SourceSelector'
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -24,37 +25,20 @@ function AppContent() {
   const [showKeyboard, setShowKeyboard] = useState(true);
   const [showFingerLayout, setShowFingerLayout] = useState(false);
   const [showHands, setShowHands] = useState(false);
+  const [textSource, setTextSource] = useState('random');
   
-  const {
-    currentChunk,
-    nextChunk,
-    typedText,
-    isComplete,
-    stats,
-    textSource,
-    handleRestart,
-    handleTryAgain,
-    initializeText,
-    setTextSource,
-    countdown
-  } = useTypingGame();
-
-  const handleSourceChange = (source) => {
-    setTextSource(source);
-  };
-
   return (
     <div className="app">
       <Navigation 
-        onSourceChange={handleSourceChange}
-        currentSource={textSource}
         showKeyboard={showKeyboard}
         onToggleKeyboard={setShowKeyboard}
         showFingerLayout={showFingerLayout}
         onToggleFingerLayout={setShowFingerLayout}
         showHands={showHands}
         onToggleHands={setShowHands}
-        hideSourceSelector={countdown !== null}
+        currentSource={textSource}
+        onSourceChange={setTextSource}
+        hideSourceSelector={false}
       />
       <TeamStatsUpdater />
       <Routes>
@@ -65,15 +49,8 @@ function AppContent() {
               showKeyboard={showKeyboard}
               showFingerLayout={showFingerLayout}
               showHands={showHands}
-              currentChunk={currentChunk}
-              nextChunk={nextChunk}
-              typedText={typedText}
-              isComplete={isComplete}
-              stats={stats}
-              handleRestart={handleRestart}
-              handleTryAgain={handleTryAgain}
-              initializeText={initializeText}
-              countdown={countdown}
+              textSource={textSource}
+              onSourceChange={setTextSource}
             />
           } 
         />
@@ -109,20 +86,24 @@ function AppContent() {
   );
 }
 
-function Home({ 
-  showKeyboard, 
-  showFingerLayout, 
-  showHands, 
-  currentChunk, 
-  nextChunk, 
-  typedText, 
-  isComplete, 
-  stats, 
-  handleRestart, 
-  handleTryAgain, 
-  initializeText, 
-  countdown 
-}) {
+function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceChange }) {
+  const {
+    currentChunk,
+    nextChunk,
+    typedText,
+    isComplete,
+    stats,
+    handleRestart,
+    handleTryAgain,
+    initializeText,
+    setTextSource,
+    countdown
+  } = useTypingGame();
+
+  useEffect(() => {
+    setTextSource(textSource);
+  }, [textSource, setTextSource]);
+
   const getNextKey = () => {
     if (!currentChunk) return '';
     const typedLength = typedText.length;

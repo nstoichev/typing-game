@@ -12,6 +12,10 @@ const SourceSelector = ({ onSourceChange, currentSource, hide }) => {
     return null;
   }
 
+  const handleSourceChange = (value) => {
+    onSourceChange(value);
+  };
+
   return (
     <div className={styles.sourceSelector}>
       <h3>Text Source</h3>
@@ -23,7 +27,7 @@ const SourceSelector = ({ onSourceChange, currentSource, hide }) => {
               name="textSource"
               value={source.id}
               checked={currentSource === source.id}
-              onChange={(e) => onSourceChange(e.target.value)}
+              onChange={(e) => handleSourceChange(e.target.value)}
             />
             {source.label}
           </label>

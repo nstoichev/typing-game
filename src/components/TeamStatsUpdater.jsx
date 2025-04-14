@@ -11,11 +11,14 @@ export default function TeamStatsUpdater() {
     if (currentUser && currentTeam && userData?.recentTests?.length > 0) {
       const latestTest = userData.recentTests[userData.recentTests.length - 1];
       
-      // Only update if this is a new test (not the same as the last one we processed)
-      if (!lastTestRef.current || 
+      // Only update if:
+      // 1. This is a new test (not the same as the last one we processed)
+      // 2. The test was completed while this team was selected
+      if ((!lastTestRef.current || 
           lastTestRef.current.timestamp !== latestTest.timestamp ||
           lastTestRef.current.wpm !== latestTest.wpm ||
-          lastTestRef.current.accuracy !== latestTest.accuracy) {
+          lastTestRef.current.accuracy !== latestTest.accuracy) &&
+          latestTest.teamId === currentTeam.id) {
         
         updateTeamStats(currentTeam.id, {
           wpm: latestTest.wpm,

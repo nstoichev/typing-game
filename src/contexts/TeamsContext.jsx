@@ -1,17 +1,17 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { 
   collection, 
-  doc, 
-  getDoc, 
+  addDoc, 
   getDocs, 
-  setDoc, 
+  doc, 
   updateDoc, 
   arrayUnion,
   query,
-  where
+  getDoc
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from './AuthContext';
+import { getAuth } from 'firebase/auth';
 
 const TeamsContext = createContext();
 
@@ -20,33 +20,75 @@ export function useTeams() {
 }
 
 export function TeamsProvider({ children }) {
-  const { currentUser } = useAuth();
   const [teams, setTeams] = useState([]);
   const [currentTeam, setCurrentTeam] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
+  const auth = getAuth();
 
-  // Create a new team
-  const createTeam = async (teamName) => {
-    if (!currentUser) return;
-    
+  // Function to get user display name
+  const getUserDisplayName = async (userId) => {
     try {
-      const teamRef = doc(collection(db, 'teams'));
-      const teamData = {
-        name: teamName,
-        members: [currentUser.uid],
-        createdAt: new Date(),
-        stats: {
-          averageWPM: 0,
-          averageAccuracy: 0,
-          totalTests: 0,
-          bestWPM: 0,
-          recentTests: []
-        }
-      };
+      // First try to get from Firebase Auth
+      const user = auth.currentUser;
       
-      await setDoc(teamRef, teamData);
-      // After creating the team, fetch the updated list of teams
-      await fetchUserTeams();
+      if (user && user.uid === userId) {
+        return user.displayName || user.email || 'Unknown';
+      }
+
+      // If not in Auth, try Firestore
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData && typeof userData.displayName === 'string') {
+          return userData.displayName;
+        }
+      }
+
+      return 'Unknown';
+    } catch (error) {
+      console.error('Error fetching user display name:', error);
+      return 'Unknown';
+    }
+  };
+
+  // Function to create a new team
+  const createTeam = async (teamName) => {
+    try {
+      const teamRef = await addDoc(collection(db, 'teams'), {
+        name: teamName,
+        createdAt: new Date(),
+        members: [{
+          id: currentUser.uid,
+          name: currentUser.displayName || currentUser.email,
+          bestWPM: 0,
+          totalTests: 0,
+          averageWPM: 0
+        }],
+        totalTests: 0,
+        averageWPM: 0,
+        bestWPM: 0
+      });
+
+      const newTeam = {
+        id: teamRef.id,
+        name: teamName,
+        members: [{
+          id: currentUser.uid,
+          name: currentUser.displayName || currentUser.email,
+          bestWPM: 0,
+          totalTests: 0,
+          averageWPM: 0
+        }],
+        totalTests: 0,
+        averageWPM: 0,
+        bestWPM: 0
+      };
+
+      setTeams(prev => [...prev, newTeam]);
+      setCurrentTeam(newTeam);
       return teamRef.id;
     } catch (error) {
       console.error('Error creating team:', error);
@@ -54,94 +96,207 @@ export function TeamsProvider({ children }) {
     }
   };
 
-  // Join an existing team
+  // Function to join a team
   const joinTeam = async (teamId) => {
-    if (!currentUser) return;
-    
     try {
       const teamRef = doc(db, 'teams', teamId);
-      await updateDoc(teamRef, {
-        members: arrayUnion(currentUser.uid)
-      });
-      // After joining the team, fetch the updated list of teams
-      await fetchUserTeams();
+      const teamDoc = await getDoc(teamRef);
+      
+      if (!teamDoc.exists()) {
+        throw new Error('Team not found');
+      }
+
+      const teamData = teamDoc.data();
+      const isAlreadyMember = teamData.members.some(member => member.id === currentUser.uid);
+
+      if (!isAlreadyMember) {
+        await updateDoc(teamRef, {
+          members: arrayUnion({
+            id: currentUser.uid,
+            name: currentUser.displayName || currentUser.email,
+            bestWPM: 0,
+            totalTests: 0,
+            averageWPM: 0
+          })
+        });
+
+        // Fetch updated teams list immediately after joining
+        await fetchUserTeams();
+      }
     } catch (error) {
       console.error('Error joining team:', error);
       throw error;
     }
   };
 
-  // Update team statistics when a member completes a test
-  const updateTeamStats = async (teamId, testStats) => {
+  // Function to update team stats
+  const updateTeamStats = async (teamId, stats) => {
     try {
       const teamRef = doc(db, 'teams', teamId);
       const teamDoc = await getDoc(teamRef);
       
-      if (teamDoc.exists()) {
-        const teamData = teamDoc.data();
-        const stats = teamData.stats;
-        const totalTests = stats.totalTests + 1;
-        
-        const updatedStats = {
-          averageWPM: ((stats.averageWPM * stats.totalTests) + testStats.wpm) / totalTests,
-          averageAccuracy: ((stats.averageAccuracy * stats.totalTests) + testStats.accuracy) / totalTests,
-          totalTests: totalTests,
-          bestWPM: Math.max(stats.bestWPM, testStats.wpm),
-          recentTests: [...stats.recentTests, {
-            userId: currentUser.uid,
-            userName: currentUser.displayName || currentUser.email,
-            wpm: testStats.wpm,
-            accuracy: testStats.accuracy,
-            timestamp: new Date()
-          }].slice(-10) // Keep last 10 tests
-        };
-        
-        await updateDoc(teamRef, {
-          stats: updatedStats
-        });
-        // After updating stats, fetch the updated list of teams
-        await fetchUserTeams();
+      if (!teamDoc.exists()) {
+        throw new Error('Team not found');
       }
+
+      const teamData = teamDoc.data();
+      const memberIndex = teamData.members.findIndex(member => member.id === currentUser.uid);
+      
+      if (memberIndex === -1) {
+        throw new Error('User is not a member of this team');
+      }
+
+      const updatedMembers = [...teamData.members];
+      const member = updatedMembers[memberIndex];
+      
+      // Update member stats
+      member.totalTests = (member.totalTests || 0) + 1;
+      member.averageWPM = ((member.averageWPM || 0) * (member.totalTests - 1) + stats.wpm) / member.totalTests;
+      member.bestWPM = Math.max(member.bestWPM || 0, stats.wpm);
+
+      // Update team stats
+      const totalTests = teamData.totalTests + 1;
+      const averageWPM = ((teamData.averageWPM || 0) * (teamData.totalTests || 0) + stats.wpm) / totalTests;
+      const bestWPM = Math.max(teamData.bestWPM || 0, stats.wpm);
+
+      await updateDoc(teamRef, {
+        members: updatedMembers,
+        totalTests,
+        averageWPM,
+        bestWPM
+      });
+
+      const updatedTeam = {
+        ...teamData,
+        id: teamId,
+        members: updatedMembers,
+        totalTests,
+        averageWPM,
+        bestWPM
+      };
+
+      setTeams(prev => prev.map(team => 
+        team.id === teamId ? updatedTeam : team
+      ));
+      setCurrentTeam(prev => prev?.id === teamId ? updatedTeam : prev);
     } catch (error) {
       console.error('Error updating team stats:', error);
       throw error;
     }
   };
 
-  // Fetch teams the current user is a member of
+  // Function to fetch user's teams
   const fetchUserTeams = async () => {
-    if (!currentUser) return;
-    
+    if (!currentUser) {
+      setTeams([]);
+      setLoading(false);
+      return;
+    }
+
     try {
-      setLoading(true);
-      const teamsQuery = query(
-        collection(db, 'teams'),
-        where('members', 'array-contains', currentUser.uid)
-      );
-      
+      const teamsQuery = query(collection(db, 'teams'));
       const querySnapshot = await getDocs(teamsQuery);
-      const teamsData = [];
       
-      querySnapshot.forEach((doc) => {
-        teamsData.push({
+      const userTeams = await Promise.all(querySnapshot.docs.map(async doc => {
+        const teamData = doc.data();
+        
+        // Get member stats from recentTests
+        const memberStats = {};
+        if (teamData.stats?.recentTests) {
+          teamData.stats.recentTests.forEach(test => {
+            if (!memberStats[test.userId]) {
+              memberStats[test.userId] = {
+                totalTests: 0,
+                totalWPM: 0,
+                bestWPM: 0
+              };
+            }
+            const stats = memberStats[test.userId];
+            stats.totalTests++;
+            stats.totalWPM += test.wpm;
+            stats.bestWPM = Math.max(stats.bestWPM, test.wpm);
+          });
+        }
+
+        // Convert members array to proper format with stats and names
+        const members = await Promise.all(
+          Array.isArray(teamData.members) 
+            ? teamData.members.map(async member => {
+                const userId = typeof member === 'string' ? member : member.id;
+                
+                // If member is an object, use its existing stats
+                const existingStats = typeof member === 'object' ? {
+                  bestWPM: member.bestWPM || 0,
+                  totalTests: member.totalTests || 0,
+                  averageWPM: member.averageWPM || 0
+                } : null;
+
+                // Use existing stats if available, otherwise calculate from recentTests
+                const stats = existingStats || memberStats[userId] || {
+                  totalTests: 0,
+                  totalWPM: 0,
+                  bestWPM: 0
+                };
+
+                const displayName = await getUserDisplayName(userId);
+                return {
+                  id: userId,
+                  name: displayName,
+                  bestWPM: stats.bestWPM,
+                  totalTests: stats.totalTests,
+                  averageWPM: stats.averageWPM || (stats.totalTests > 0 ? stats.totalWPM / stats.totalTests : 0)
+                };
+              })
+            : []
+        );
+
+        // Calculate team stats from members
+        const teamStats = members.reduce((acc, member) => {
+          acc.totalTests += member.totalTests;
+          acc.totalWPM += member.averageWPM * member.totalTests;
+          acc.bestWPM = Math.max(acc.bestWPM, member.bestWPM);
+          return acc;
+        }, { totalTests: 0, totalWPM: 0, bestWPM: 0 });
+
+        const averageWPM = teamStats.totalTests > 0 ? teamStats.totalWPM / teamStats.totalTests : 0;
+
+        return {
           id: doc.id,
-          ...doc.data()
-        });
-      });
-      
-      setTeams(teamsData);
+          name: teamData.name,
+          members,
+          averageWPM,
+          totalTests: teamStats.totalTests,
+          bestWPM: teamStats.bestWPM,
+          stats: {
+            averageAccuracy: teamData.stats?.averageAccuracy || 0,
+            averageWPM,
+            bestWPM: teamStats.bestWPM,
+            recentTests: teamData.stats?.recentTests || [],
+            totalTests: teamStats.totalTests
+          },
+          createdAt: teamData.createdAt
+        };
+      }));
+
+      const filteredTeams = userTeams.filter(team => 
+        team.members.some(member => member.id === currentUser.uid)
+      );
+
+      setTeams(filteredTeams);
+      setLoading(false);
     } catch (error) {
-      console.error('Error fetching user teams:', error);
-    } finally {
+      console.error('Error fetching teams:', error);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (currentUser) {
-      fetchUserTeams();
-    } else {
-      setTeams([]);
+    fetchUserTeams();
+  }, [currentUser]);
+
+  // Reset currentTeam when user changes
+  useEffect(() => {
+    if (!currentUser) {
       setCurrentTeam(null);
     }
   }, [currentUser]);
@@ -162,4 +317,4 @@ export function TeamsProvider({ children }) {
       {children}
     </TeamsContext.Provider>
   );
-} 
+}

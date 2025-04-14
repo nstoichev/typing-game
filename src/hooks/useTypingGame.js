@@ -1,4 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useTeams } from '../contexts/TeamsContext';
 import words from '../jsons/words.json';
 
 const CHUNK_SIZE = 100;
@@ -19,6 +22,9 @@ const VALID_TYPING_KEYS = new Set([
 ]);
 
 export const useTypingGame = () => {
+  const location = useLocation();
+  const { saveTestResults } = useAuth();
+  const { currentTeam } = useTeams();
   const [text, setText] = useState('');
   const [currentChunk, setCurrentChunk] = useState('');
   const [nextChunk, setNextChunk] = useState('');
@@ -138,13 +144,20 @@ export const useTypingGame = () => {
   };
 
   const handleKeyDown = useCallback((e) => {
+    // Only process events if we're on the home or practice page
+    if (location.pathname !== '/' && location.pathname !== '/practice') {
+      return;
+    }
+
     // Prevent any typing if the game is complete
+    console.log('handleKeyDown: isComplete:', isComplete);
     if (isComplete) {
       return;
     }
 
     // Check if the key is a valid typing key
-    const isValidTypingKey = VALID_TYPING_KEYS.has(e.key.toLowerCase()) || e.key === 'Backspace';
+    const key = e.key || '';
+    const isValidTypingKey = VALID_TYPING_KEYS.has(key.toLowerCase()) || key === 'Backspace';
 
     if (!isActive && isValidTypingKey) {
       setIsActive(true);
@@ -224,7 +237,7 @@ export const useTypingGame = () => {
         }
       }
     }
-  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete]);
+  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete, wrongWords, location]);
 
   const handleTryAgain = () => {
     // Clear the timer
@@ -250,6 +263,10 @@ export const useTypingGame = () => {
     handleTryAgain();
   };
 
+  const handleSetTextSource = (newSource) => {
+    setTextSource(newSource);
+  };
+
   useEffect(() => {
     initializeText();
   }, [textSource]);
@@ -261,12 +278,17 @@ export const useTypingGame = () => {
       const wpm = Math.round((textLength / 5) / timeInMinutes);
       const accuracy = Math.round(((textLength - wrongChars) / textLength) * 100);
       
-      setStats({
+      const stats = {
         wpm,
         accuracy,
         wrongWords: [...new Set(wrongWords)]
-      });
+      };
+      
+      setStats(stats);
       setIsComplete(true);
+      
+      // Save test results with current team ID
+      saveTestResults(stats, currentTeam?.id);
     };
 
     // Normal mode - when completing the entire text
@@ -280,7 +302,7 @@ export const useTypingGame = () => {
       calculateStats(1); // Exactly 1 minute for countdown mode
       setIsActive(false);
     }
-  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
+  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars, saveTestResults, currentTeam]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -302,7 +324,7 @@ export const useTypingGame = () => {
     } else {
       newText = generateRandomText();
     }
-    
+        
     // For countdown mode, generate more initial text
     if (countdown !== null) {
       const additionalText = generateMoreText();
@@ -344,7 +366,7 @@ export const useTypingGame = () => {
     handleRestart,
     handleTryAgain,
     initializeText,
-    setTextSource,
+    setTextSource: handleSetTextSource,
     isActive,
     setIsActive,
     countdown,
