@@ -1,11 +1,17 @@
 .navigation {
   padding: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   z-index: 1000;
+
+  position: sticky;
+  width: 100%;
+  top: 0;
+  background-color: var(--background-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navigation ul {
@@ -32,33 +38,6 @@
   padding: 0.5rem;
 }
 
-.logout-button {
-  background-color: #e74c3c;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.logout-button:hover {
-  background-color: #c0392b;
-}
-
-.login-button {
-  color: #ecf0f1;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  background-color: #27ae60;
-  transition: background-color 0.3s;
-}
-
-.login-button:hover {
-  background-color: #219a52;
-}
-
 .team-info {
   display: flex;
   align-items: center;
@@ -68,95 +47,3 @@
   border-radius: 4px;
   color: #ecf0f1;
 }
-
-.settings-container {
-  position: relative;
-}
-
-.settings-button {
-  background: none;
-  border: none;
-  color: #ecf0f1;
-  cursor: pointer;
-  font-size: 1.5rem;
-  padding: 0.5rem;
-  transition: transform 0.3s;
-}
-
-.settings-button:hover {
-  transform: rotate(90deg);
-}
-
-.settings-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background-color: #34495e;
-  padding: 1rem;
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 200px;
-}
-
-.settings-panel button {
-  background-color: #2c3e50;
-  color: #ecf0f1;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.settings-panel button:hover {
-  background-color: #2980b9;
-}
-
-.settings-panel button.active {
-  background-color: #3498db;
-}
-
-/* Custom checkbox styles */
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.checkbox-container input[type="checkbox"] {
-  display: none;
-}
-
-.checkmark {
-  width: 20px;
-  height: 20px;
-  background-color: #2c3e50;
-  border: 2px solid #ecf0f1;
-  border-radius: 4px;
-  position: relative;
-  transition: background-color 0.3s;
-}
-
-.checkbox-container input[type="checkbox"]:checked + .checkmark {
-  background-color: #3498db;
-}
-
-.checkmark:after {
-  content: '';
-  position: absolute;
-  display: none;
-  left: 6px;
-  top: 2px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.checkbox-container input[type="checkbox"]:checked + .checkmark:after {
-  display: block;
-} 

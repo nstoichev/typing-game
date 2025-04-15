@@ -128,7 +128,7 @@ const Account = () => {
           {expandedSections.activity && (
             <div className={css['section-content']}>
               <div className={css['activity-list']}>
-                {userData?.recentTests?.map((test, index) => (
+                {userData?.recentTests?.slice(-10).reverse().map((test, index) => (
                   <div key={index} className={css['activity-item']}>
                     <div className={css['activity-date']}>
                       {new Date(test.timestamp).toLocaleDateString()} at{' '}
@@ -179,7 +179,7 @@ const Account = () => {
                         checked={userData?.highlightMode === 'words' ? false : true}
                         onChange={(e) => handleHighlightModeChange('letters')}
                       />
-                      Letters
+                      <span>Letters</span>
                     </label>
                     <label className={css['radio-label']}>
                       <input
@@ -189,7 +189,7 @@ const Account = () => {
                         checked={userData?.highlightMode === 'words'}
                         onChange={(e) => handleHighlightModeChange('words')}
                       />
-                      Words
+                      <span>Words</span>
                     </label>
                   </div>
                 </div>

@@ -100,18 +100,20 @@ const Navigation = ({
           )}
         </div>
 
-        <Settings
-          onSourceChange={onSourceChange}
-          currentSource={currentSource}
-          showKeyboard={showKeyboard}
-          onToggleKeyboard={onToggleKeyboard}
-          showFingerLayout={showFingerLayout}
-          onToggleFingerLayout={onToggleFingerLayout}
-          showHands={showHands}
-          onToggleHands={onToggleHands}
-          hideSourceSelector={hideSourceSelector}
-          showSourceSelector={!isPracticePage}
-        />
+        {location.pathname !== '/auth' && (
+          <Settings
+            onSourceChange={onSourceChange}
+            currentSource={currentSource}
+            showKeyboard={showKeyboard}
+            onToggleKeyboard={onToggleKeyboard}
+            showFingerLayout={showFingerLayout}
+            onToggleFingerLayout={onToggleFingerLayout}
+            showHands={showHands}
+            onToggleHands={onToggleHands}
+            hideSourceSelector={hideSourceSelector}
+            showSourceSelector={!isPracticePage}
+          />
+        )}
       </div>
     </nav>
   );

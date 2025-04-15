@@ -11,7 +11,7 @@ const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false, isLoadin
     <div className={styles.actionButtons}>
       {!isPracticeMode && (
         <button 
-          className={styles.button} 
+          className="button"
           onClick={onRestart}
           onMouseUp={handleMouseUp}
           disabled={isLoading}
@@ -20,7 +20,7 @@ const ActionButtons = ({ onRestart, onGenerate, isPracticeMode = false, isLoadin
         </button>
       )}
       <button 
-        className={styles.button} 
+        className="button"
         onClick={onGenerate}
         onMouseUp={handleMouseUp}
         disabled={isLoading}
