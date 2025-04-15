@@ -2,15 +2,28 @@
   font-family: "Courier Prime", monospace;
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --light-color: #fff;
+  --dark-color: #000;
+  --button-bg-color-success: #2ecc71;
+  --button-bg-color-danger: #e74c3c;
+  --button-bg-color-warning: #f1c40f;
+  --button-bg-color-info: #3498db;
+
+  --button-bg-color-light: #4a90e2;
+  --button-bg-color-dark: var(--dark-color);
+
+  --text-color: var(--dark-color);
+  --background-color: var(--light-color);
+  --button-bg-color: var(--dark-color);
+  --button-text-color: var(--light-color);
 }
 
 a {
@@ -18,7 +31,8 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
-a:hover {
+
+a:not(.button):hover {
   color: #535bf2;
 }
 
@@ -72,4 +86,55 @@ h1, h2, h3, h4, h5, h6 {
 
 * {
   box-sizing: border-box;
+}
+
+.button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--button-bg-color-light);
+  color: var(--button-text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
+  transition: box-shadow 0.2s;
+  display: inline-block;
+  line-height: 1;
+}
+
+.button--small {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.button.active {
+  background-color: var(--button-bg-color-success);
+}
+
+.button:hover {
+  box-shadow: var(--button-bg-color-light) 0 0 10px;
+  color: var(--button-text-color);
+}
+
+.button.active:hover {
+  box-shadow: var(--button-bg-color-success) 0 0 10px;
+}
+
+.button--danger {
+  background-color: var(--button-bg-color-danger);
+  color: var(--button-text-color);
+}
+
+.button--danger:hover {
+  box-shadow: var(--button-bg-color-danger) 0 0 10px;
+}
+
+.button--success {
+  background-color: var(--button-bg-color-success);
+  color: var(--button-text-color);
+}
+
+.button--success:hover {
+  box-shadow: var(--button-bg-color-success) 0 0 10px;
 }

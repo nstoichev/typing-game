@@ -43,7 +43,7 @@ const Navigation = ({
         <li>
           <Link 
             to="/" 
-            className={location.pathname === '/' ? 'active' : ''}
+            className={`button ${location.pathname === '/' ? 'active' : ''}`}
           >
             Freestyle
           </Link>
@@ -51,7 +51,7 @@ const Navigation = ({
         <li>
           <Link 
             to="/practice" 
-            className={location.pathname === '/practice' ? 'active' : ''}
+            className={`button ${location.pathname === '/practice' ? 'active' : ''}`}
           >
             Speed test
           </Link>
@@ -60,7 +60,7 @@ const Navigation = ({
           <li>
             <Link 
               to="/teams" 
-              className={location.pathname === '/teams' ? 'active' : ''}
+              className={`button ${location.pathname === '/teams' ? 'active' : ''}`}
             >
               Teams
             </Link>
@@ -78,20 +78,23 @@ const Navigation = ({
               {currentTeam && (
                 <div className="team-info">
                   <span>Team: {currentTeam.name}</span>
-                  <button onClick={handleDisableTeam} className="disable-team-button">
+                  <button onClick={handleDisableTeam} className="button button--small button--danger">
                     Disable Team
                   </button>
                 </div>
               )}
-              <Link to="/account" className="account-link">
+              <Link 
+                to="/account" 
+                className={`button ${location.pathname === '/account' ? 'active' : ''}`}
+              >
                 Account
               </Link>
-              <button onClick={handleLogout} className="logout-button">
+              <button onClick={handleLogout} className="button button--danger">
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/auth" className="login-button">
+            <Link to="/auth" className="button button--success">
               Login
             </Link>
           )}
