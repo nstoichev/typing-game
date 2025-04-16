@@ -287,9 +287,6 @@ export const useTypingGame = () => {
       
       setStats(stats);
       setIsComplete(true);
-      
-      // Save test results with current team ID
-      saveTestResults(stats, currentTeam?.id);
     };
 
     // Normal mode - when completing the entire text
@@ -303,7 +300,7 @@ export const useTypingGame = () => {
       calculateStats(1); // Exactly 1 minute for countdown mode
       setIsActive(false);
     }
-  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars, saveTestResults, currentTeam]);
+  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);

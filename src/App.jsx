@@ -14,7 +14,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TeamsProvider } from './contexts/TeamsContext'
 import Auth from './components/Auth'
 import TeamStatsUpdater from './components/TeamStatsUpdater'
-import SourceSelector from './components/SourceSelector'
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
