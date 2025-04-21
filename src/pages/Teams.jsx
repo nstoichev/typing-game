@@ -64,16 +64,16 @@ const Teams = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className="container">
       <div className={styles.teamActions}>
         <button 
-          className={styles.actionButton}
+          className={`button ${showCreateForm ? 'button--danger' : ''}`}
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
           {showCreateForm ? 'Cancel' : 'Create New Team'}
         </button>
         <button 
-          className={styles.actionButton}
+          className={`button ${showJoinForm ? 'button--danger' : ''}`}
           onClick={() => setShowJoinForm(!showJoinForm)}
         >
           {showJoinForm ? 'Cancel' : 'Join Team'}
@@ -81,7 +81,7 @@ const Teams = () => {
       </div>
 
       {showCreateForm && (
-        <form onSubmit={handleCreateTeam} className={styles.form}>
+        <form onSubmit={handleCreateTeam} className="form">
           <input
             type="text"
             value={newTeamName}
@@ -89,12 +89,12 @@ const Teams = () => {
             placeholder="Team name"
             required
           />
-          <button type="submit" className={styles.submitButton}>Create Team</button>
+          <button type="submit" className="button">Create Team</button>
         </form>
       )}
 
       {showJoinForm && (
-        <form onSubmit={handleJoinTeam} className={styles.form}>
+        <form onSubmit={handleJoinTeam} className="form">
           <input
             type="text"
             value={joinTeamId}
@@ -102,7 +102,7 @@ const Teams = () => {
             placeholder="Enter Team ID"
             required
           />
-          <button type="submit" className={styles.submitButton}>Join Team</button>
+          <button type="submit" className="button">Join Team</button>
         </form>
       )}
 
@@ -126,7 +126,7 @@ const Teams = () => {
                 <div className={styles.teamId}>
                   <span>ID: {team.id}</span>
                   <button 
-                    className={styles.copyButton}
+                    className="button-form"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCopyTeamId(team.id);
@@ -138,20 +138,20 @@ const Teams = () => {
               </div>
               <div className={styles.teamStats}>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Average WPM</span>
+                  <span className="label-text">Average WPM</span>
                   <span className={styles.statValue}>{team.averageWPM?.toFixed(1) || '0.0'}</span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Total Tests</span>
+                  <span className="label-text">Total Tests</span>
                   <span className={styles.statValue}>{team.totalTests || 0}</span>
                 </div>
                 <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Best WPM</span>
+                  <span className="label-text">Best WPM</span>
                   <span className={styles.statValue}>{team.bestWPM?.toFixed(1) || '0.0'}</span>
                 </div>
               </div>
               <button 
-                className={styles.selectButton}
+                className="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSelectTeam(team);

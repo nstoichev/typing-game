@@ -14,10 +14,6 @@
   justify-content: center;
 }
 
-.settingsButton:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
 .settingsButton.rotate {
   transform: rotate(90deg);
 }

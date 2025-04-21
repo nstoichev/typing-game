@@ -68,7 +68,7 @@ const Account = () => {
   }
 
   return (
-    <div className={css['account-container']}>
+    <div className="container">
       <div className={css['account-header']}>
         <h1>Account Settings</h1>
         <div className={css['user-info']}>
