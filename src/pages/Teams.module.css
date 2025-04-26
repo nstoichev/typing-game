@@ -2,15 +2,15 @@
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: #666;
+  color: var(--text-color);
 }
 
 .noTeams {
   text-align: center;
   padding: 3rem;
-  background: white;
+  background: var(--card-bg-color);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   grid-column: 1 / -1;
 }
 
@@ -36,17 +36,21 @@
 }
 
 .teamCard {
-  background: var(--light-color-active);
+  background: var(--card-bg-color);
   border-radius: 8px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   transition: all 0.2s ease;
   cursor: pointer;
   user-select: none;
 }
 
 .teamCard.active {
-  box-shadow: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);
+  box-shadow: var(--card-shadow-active);
+}
+
+.teamCard:not(.active):hover {
+  box-shadow: var(--card-shadow-hover);
 }
 
 .teamHeader {
@@ -73,6 +77,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+  opacity: 0.6;
 }
 
 .teamStats {
@@ -116,17 +121,17 @@
 
 .teamDetails {
   margin-top: 2rem;
-  background: white;
+  background: var(--card-bg-color);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   padding: 1.5rem;
 }
 
 .teamDetails h2 {
   margin: 0 0 1.5rem 0;
-  color: #2c3e50;
+  color: var(--text-color);
   font-size: 1.5rem;
-  border-bottom: 2px solid #4a90e2;
+  border-bottom: 2px solid var(--button-bg);
   padding-bottom: 0.5rem;
 }
 
@@ -139,12 +144,12 @@
 .membersTable table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: var(--card-bg-color);
 }
 
 .membersTable th {
-  background: #4a90e2;
-  color: white;
+  background: var(--button-bg);
+  color: var(--light-color);
   font-weight: 500;
   text-align: left;
   padding: 1rem;
@@ -154,8 +159,8 @@
 
 .membersTable td {
   padding: 1rem;
-  border-bottom: 1px solid #eee;
-  color: #2c3e50;
+  border-bottom: 1px solid var(--border-color-light);
+  color: var(--dark-color);
 }
 
 .membersTable tr:hover {

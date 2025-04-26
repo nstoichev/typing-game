@@ -29,7 +29,8 @@
   position: absolute;
   top: 50px;
   right: 0;
-  background: white;
+  background: var(--card-bg-color);
+  box-shadow: var(--card-shadow);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);

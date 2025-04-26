@@ -10,16 +10,17 @@
 
   --light-color: #f1f1f1;
   --light-color-active: #ffffff;
-  --dark-color: #242424;
-  --dark-color-active: #1a1a1a;
+  --box-shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --box-shadow-light-hover: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);
   --border-color-light: #ddd;
-  --border-color-dark: #242424;
-  
-  --box-shadow-light: 0 0 10px 0 rgba(241, 241, 241, 1);
-  --box-shadow-dark: 0 0 10px 0 rgba(36, 36, 36, 0.4);
 
-  --box-shadow-light-hover: 0 0 10px 0 rgba(241, 241, 241, 1);
-  --box-shadow-dark-hover: 0 0 10px 0 rgba(36, 36, 36, 1);
+  --dark-color: #242424;
+  --dark-color-active: #111;
+  --box-shadow-dark: 0 2px 10px rgba(255, 255, 255, 0.4);
+  --box-shadow-dark-wide: 0 0px 20px rgba(255, 255, 255, 0.7);
+  --box-shadow-dark-active: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);
+  --box-shadow-light-active: 0 0 0 2px #4a90e2, 0 4px 8px rgba(214, 223, 233, 0.9);
+  --border-color-dark: #242424;
 
   --button-bg-color-success: #2ecc71;
   --button-bg-color-danger: #e74c3c;
@@ -27,20 +28,24 @@
   --button-bg-color-info: #3498db;
   --button-bg-color-light: #4a90e2;
   --button-bg-color-dark: var(--dark-color);
+
+  --button-bg-color: var(--button-bg-color-light);
+
+
   --text-color: var(--dark-color);
-  
-  --background-color-light: #f1f1f1;
   --background-color: var(--light-color);
-  --button-bg-color: var(--dark-color);
-  --button-text-color: var(--light-color);
+  --card-bg-color: var(--light-color-active);
+  --card-shadow: var(--box-shadow-light);
+  --card-shadow-active: var(--box-shadow-dark-active);
+  --card-shadow-hover: var(--box-shadow-light-hover);
+  --button-text: var(--text-color);
+  --button-bg: var(--button-bg-color-light);
 
-  color: var(--dark-color);
-  background-color: var(--light-color);
-}
+  --button-bg-color: var(--button-bg);
+  --button-text-color: var(--light-color-active);
 
-@media (prefers-color-scheme: light) {
-  :root {
-  }
+  color: var(--text-color);
+  background-color: var(--background-color);
 }
 
 a {
@@ -75,9 +80,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: none;
@@ -96,7 +103,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 8px 16px;
   border: none;
   border-radius: 4px;
-  background-color: var(--button-bg-color-light);
+  background-color: var(--button-bg-color);
   color: var(--button-text-color);
   font-size: 1rem;
   cursor: pointer;
@@ -172,7 +179,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .label-text {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-color);
 }
 
 /* Container */
@@ -195,4 +202,17 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 4px;
   flex: 1;
   background-color: var(--light-color-active);
+}
+
+/* Dark Mode */
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --text-color: var(--light-color);
+    --background-color: var(--dark-color);
+    --card-bg-color: var(--dark-color-active);
+    --card-shadow: var(--box-shadow-dark);
+    --card-shadow-hover: var(--box-shadow-dark-wide);
+    --button-bg: #444;
+  }
 }

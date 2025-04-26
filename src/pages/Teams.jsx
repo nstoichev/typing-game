@@ -65,21 +65,6 @@ const Teams = () => {
 
   return (
     <div className="container">
-      <div className={styles.teamActions}>
-        <button 
-          className={`button ${showCreateForm ? 'button--danger' : ''}`}
-          onClick={() => setShowCreateForm(!showCreateForm)}
-        >
-          {showCreateForm ? 'Cancel' : 'Create New Team'}
-        </button>
-        <button 
-          className={`button ${showJoinForm ? 'button--danger' : ''}`}
-          onClick={() => setShowJoinForm(!showJoinForm)}
-        >
-          {showJoinForm ? 'Cancel' : 'Join Team'}
-        </button>
-      </div>
-
       {showCreateForm && (
         <form onSubmit={handleCreateTeam} className="form">
           <input
@@ -107,6 +92,26 @@ const Teams = () => {
       )}
 
       {error && <div className={styles.errorMessage}>{error}</div>}
+
+      <div className={styles.teamActions}>
+        {!showJoinForm && (
+          <button 
+            className={`button ${showCreateForm ? 'button--danger' : ''}`}
+            onClick={() => setShowCreateForm(!showCreateForm)}
+          >
+            {showCreateForm ? 'Cancel' : 'Create New Team'}
+          </button>
+        )}
+
+        {!showCreateForm && (
+          <button 
+            className={`button ${showJoinForm ? 'button--danger' : ''}`}
+            onClick={() => setShowJoinForm(!showJoinForm)}
+          >
+            {showJoinForm ? 'Cancel' : 'Join Team'}
+          </button>
+        )}
+      </div>      
 
       <div className={styles.teamsGrid}>
         {teams.length === 0 ? (
