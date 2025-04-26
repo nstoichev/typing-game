@@ -1,6 +1,5 @@
 .navigation {
   padding: 1rem;
-  margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -10,7 +9,7 @@
   width: 100%;
   top: 0;
   background-color: var(--background-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
 }
 
 .navigation ul {
