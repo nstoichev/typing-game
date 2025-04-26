@@ -29,34 +29,26 @@ export function TeamsProvider({ children }) {
   // Function to get user display name
   const getUserDisplayName = async (userId) => {
     try {
-      console.log('Fetching display name for user:', userId);
-      
       // First try to get from Firebase Auth for current user
       const user = auth.currentUser;
       
       if (user && user.uid === userId) {
-        console.log('Found current user in Auth:', user.displayName || user.email);
         return user.displayName || user.email || 'Unknown';
       }
 
       // For other users, try Firestore
       const userRef = doc(db, 'users', userId);
-      console.log('Attempting to fetch from Firestore...');
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        console.log('Found user in Firestore:', userData);
         // Return displayName if it exists, otherwise try email or fallback to Unknown
         const displayName = userData.displayName || userData.email || 'Unknown';
-        console.log('Returning display name:', displayName);
         return displayName;
       }
 
-      console.log('User not found in Firestore');
       return 'Unknown';
     } catch (error) {
-      console.error('Error fetching user display name:', error);
       return 'Unknown';
     }
   };

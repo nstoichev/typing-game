@@ -16,7 +16,6 @@ const Teams = () => {
   const handleCreateTeam = async (e) => {
     e.preventDefault();
     if (!newTeamName.trim()) {
-      setError('Team name cannot be empty');
       return;
     }
     try {
@@ -32,7 +31,6 @@ const Teams = () => {
   const handleJoinTeam = async (e) => {
     e.preventDefault();
     if (!joinTeamId.trim()) {
-      setError('Team ID cannot be empty');
       return;
     }
     try {
