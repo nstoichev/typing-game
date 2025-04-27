@@ -56,16 +56,6 @@ const Navigation = ({
             Speed test
           </Link>
         </li>
-        {currentUser && (
-          <li>
-            <Link 
-              to="/teams" 
-              className={`button ${location.pathname === '/teams' ? 'active' : ''}`}
-            >
-              Teams
-            </Link>
-          </li>
-        )}
       </ul>
 
       <div className="right-container">
@@ -89,6 +79,14 @@ const Navigation = ({
               >
                 Account
               </Link>
+              {currentUser && (
+                  <Link 
+                    to="/teams" 
+                    className={`button ${location.pathname === '/teams' ? 'active' : ''}`}
+                  >
+                    Teams
+                  </Link>
+              )}              
               <button onClick={handleLogout} className="button button--danger">
                 Logout
               </button>
