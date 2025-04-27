@@ -56,7 +56,8 @@ export const useTypingGame = () => {
       } else if (attempt < MAX_WIKI_ATTEMPTS) {
         return fetchWikipediaText(attempt + 1);
       } else {
-        throw new Error('Could not find valid Wikipedia text after maximum attempts');
+        console.warn('Could not find valid Wikipedia text after maximum attempts, falling back to random text');
+        return generateRandomText();
       }
     } catch (error) {
       console.error('Error fetching Wikipedia text:', error);
@@ -336,6 +337,12 @@ export const useTypingGame = () => {
       } else {
         newText = generateRandomText();
       }
+      
+      // Ensure we have valid text before proceeding
+      if (!newText || typeof newText !== 'string') {
+        console.error('Invalid text received, falling back to random text');
+        newText = generateRandomText();
+      }
           
       // For countdown mode, generate more initial text
       if (countdown !== null) {
@@ -361,6 +368,14 @@ export const useTypingGame = () => {
       setCurrentChunkStartIndex(0);
     } catch (error) {
       console.error('Error initializing text:', error);
+      // Fallback to random text if anything goes wrong
+      const fallbackText = generateRandomText();
+      setText(fallbackText);
+      const firstChunk = getChunkWithWordBoundary(fallbackText, 0);
+      setCurrentChunk(firstChunk.chunk);
+      const secondChunk = getChunkWithWordBoundary(fallbackText, firstChunk.endIndex);
+      setNextChunk(secondChunk.chunk);
+      setCurrentChunkStartIndex(0);
     } finally {
       setIsLoading(false);
     }
