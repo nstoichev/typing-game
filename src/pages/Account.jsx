@@ -13,6 +13,31 @@ const Account = () => {
     preferences: false
   });
 
+  // Get OS theme preference
+  const getOSTheme = () => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  // Update CSS variables based on theme
+  const updateThemeVariables = (theme) => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.style.setProperty('--text-color', 'var(--light-color)');
+      root.style.setProperty('--background-color', 'var(--dark-color)');
+      root.style.setProperty('--card-bg-color', 'var(--dark-color-active)');
+      root.style.setProperty('--card-shadow', 'var(--box-shadow-dark)');
+      root.style.setProperty('--card-shadow-hover', 'var(--box-shadow-dark-wide)');
+      root.style.setProperty('--button-bg', '#444');
+    } else {
+      root.style.setProperty('--text-color', 'var(--dark-color)');
+      root.style.setProperty('--background-color', 'var(--light-color)');
+      root.style.setProperty('--card-bg-color', 'var(--light-color-active)');
+      root.style.setProperty('--card-shadow', 'var(--box-shadow-light)');
+      root.style.setProperty('--card-shadow-hover', 'var(--box-shadow-light-hover)');
+      root.style.setProperty('--button-bg', 'var(--button-bg-color-light)');
+    }
+  };
+
   React.useEffect(() => {
     const fetchUserData = async () => {
       if (currentUser) {
@@ -21,7 +46,17 @@ const Account = () => {
           const userDoc = await getDoc(userRef);
           
           if (userDoc.exists()) {
-            setUserData(userDoc.data());
+            const data = userDoc.data();
+            // If user hasn't set a theme preference, use OS preference
+            if (!data.theme) {
+              const osTheme = getOSTheme();
+              await updateDoc(userRef, { theme: osTheme });
+              setUserData({ ...data, theme: osTheme });
+              updateThemeVariables(osTheme);
+            } else {
+              setUserData(data);
+              updateThemeVariables(data.theme);
+            }
           }
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -56,6 +91,27 @@ const Account = () => {
       }));
     } catch (error) {
       console.error('Error updating highlight mode:', error);
+    }
+  };
+
+  const handleThemeChange = async (theme) => {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        theme: theme
+      });
+      
+      setUserData(prev => ({
+        ...prev,
+        theme: theme
+      }));
+
+      // Update CSS variables when theme changes
+      updateThemeVariables(theme);
+    } catch (error) {
+      console.error('Error updating theme:', error);
     }
   };
 
@@ -158,7 +214,28 @@ const Account = () => {
               <div className={css['preferences-list']}>
                 <div className={css['preference-item']}>
                   <span className={css['preference-label']}>Theme</span>
-                  <span className={css['preference-value']}>Light</span>
+                  <div className={css['radio-group']}>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="theme"
+                        value="light"
+                        checked={userData?.theme === 'light'}
+                        onChange={(e) => handleThemeChange('light')}
+                      />
+                      <span>Light</span>
+                    </label>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="theme"
+                        value="dark"
+                        checked={userData?.theme === 'dark'}
+                        onChange={(e) => handleThemeChange('dark')}
+                      />
+                      <span>Dark</span>
+                    </label>
+                  </div>
                 </div>
                 <div className={css['preference-item']}>
                   <span className={css['preference-label']}>Sound Effects</span>

@@ -10,7 +10,7 @@
 
 .account-header h1 {
   font-size: 2rem;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 1.5rem;
 }
 
@@ -19,9 +19,9 @@
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
-  background-color: #f8f9fa;
+  background-color: var(--card-bg-color);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
 }
 
 .avatar-placeholder {
@@ -40,12 +40,10 @@
 .user-details h2 {
   margin: 0;
   font-size: 1.25rem;
-  color: #333;
 }
 
 .user-details .email {
   margin: 0.25rem 0 0;
-  color: #666;
   font-size: 0.9rem;
 }
 
@@ -56,9 +54,9 @@
 }
 
 .account-section {
-  background: white;
+  background: var(--card-bg-color);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--card-shadow);
   overflow: hidden;
 }
 
@@ -68,24 +66,26 @@
   align-items: center;
   padding: 1rem 1.5rem;
   background: #f8f9fa;
+  background: var(--button-bg-color);
   cursor: pointer;
   transition: background-color 0.2s;
   user-select: none;
+  transition: opacity 0.2s;
 }
 
 .section-header:hover {
-  background: #e9ecef;
+  opacity: 0.8;
 }
 
 .section-header h2 {
   font-size: 1.2rem;
-  color: #333;
   margin: 0;
+  color: var(--button-text-color);
 }
 
 .arrow {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--button-text-color);
   transition: transform 0.3s ease;
 }
 
@@ -119,19 +119,20 @@
   text-align: center;
   padding: 1rem;
   background: #f8f9fa;
+  background: var(--button-bg-color);
   border-radius: 6px;
 }
 
 .stat-value {
   font-size: 1.8rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: var(--button-text-color);
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
   font-size: 0.9rem;
-  color: #666;
+  color: var(--button-text-color);
 }
 
 .activity-list {
@@ -145,18 +146,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--card-bg-color);
+  box-shadow: var(--card-shadow);
+  color: var(--text-color);
   border-radius: 6px;
 }
 
 .activity-date {
   font-size: 0.9rem;
-  color: #666;
+  opacity: 0.7;
 }
 
 .activity-stats {
   font-weight: 500;
-  color: #2c3e50;
 }
 
 .preferences-list {
@@ -170,23 +172,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f8f9fa;
+  background: var(--card-bg-color);
+  box-shadow: var(--card-shadow);
+  color: var(--text-color);
   border-radius: 6px;
 }
 
 .preference-label {
   font-weight: 500;
-  color: #2c3e50;
-}
-
-.preference-value {
-  color: #666;
 }
 
 .loading-spinner {
   text-align: center;
   padding: 2rem;
-  color: #666;
+  color: var(--text-color);
 }
 
 .radio-group {

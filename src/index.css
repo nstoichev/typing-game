@@ -206,7 +206,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Dark Mode */
 
-@media (prefers-color-scheme: light) {
+@media (prefers-color-scheme: dark) {
   :root {
     --text-color: var(--light-color);
     --background-color: var(--dark-color);
