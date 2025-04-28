@@ -14,8 +14,8 @@
   --box-shadow-light-hover: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);
   --border-color-light: #ddd;
 
-  --dark-color: #242424;
-  --dark-color-active: #111;
+  --dark-color: #333;
+  --dark-color-active: #242424;
   --box-shadow-dark: 0 2px 10px rgba(255, 255, 255, 0.4);
   --box-shadow-dark-wide: 0 0px 20px rgba(255, 255, 255, 0.7);
   --box-shadow-dark-active: 0 0 0 2px #4a90e2, 0 4px 8px rgba(74, 144, 226, 0.2);

@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TeamsProvider } from './contexts/TeamsContext'
 import Auth from './components/Auth'
 import TeamStatsUpdater from './components/TeamStatsUpdater'
+import { useTheme } from './hooks/useTheme'
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -25,6 +26,9 @@ function AppContent() {
   const [showFingerLayout, setShowFingerLayout] = useState(false);
   const [showHands, setShowHands] = useState(false);
   const [textSource, setTextSource] = useState('random');
+  
+  // Initialize theme
+  useTheme();
   
   return (
     <div className="app">
