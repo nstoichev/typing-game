@@ -66,7 +66,7 @@ const Navigation = ({
                 {currentUser.displayName || currentUser.email}
               </span>
               {currentTeam && (
-                <div className="team-info">
+                <div className={`team-info ${!isPracticePage ? 'team-info--disabled' : ''}`}>
                   <span>Team: {currentTeam.name}</span>
                   <button onClick={handleDisableTeam} className="button button--small button--danger">
                     Disable Team

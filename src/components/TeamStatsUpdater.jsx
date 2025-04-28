@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTeams } from '../contexts/TeamsContext';
+import { useLocation } from 'react-router-dom';
 
 export default function TeamStatsUpdater() {
   const { currentUser, userData } = useAuth();
   const { currentTeam, updateTeamStats } = useTeams();
   const lastTestRef = useRef(null);
+  const location = useLocation();
 
   useEffect(() => {
-    if (currentUser && currentTeam && userData?.recentTests?.length > 0) {
+    // Only update team stats if we're on the practice page
+    if (location.pathname === '/practice' && currentUser && currentTeam && userData?.recentTests?.length > 0) {
       const latestTest = userData.recentTests[userData.recentTests.length - 1];
       
       // Only update if:
@@ -29,7 +32,7 @@ export default function TeamStatsUpdater() {
         lastTestRef.current = latestTest;
       }
     }
-  }, [currentUser, currentTeam, userData?.recentTests]);
+  }, [currentUser, currentTeam, userData?.recentTests, location.pathname]);
 
   return null;
 } 

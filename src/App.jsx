@@ -15,6 +15,7 @@ import { TeamsProvider } from './contexts/TeamsContext'
 import Auth from './components/Auth'
 import TeamStatsUpdater from './components/TeamStatsUpdater'
 import { useTheme } from './hooks/useTheme'
+import PageWrapper from './components/PageWrapper'
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -44,47 +45,49 @@ function AppContent() {
         hideSourceSelector={false}
       />
       <TeamStatsUpdater />
-      <Routes>
-        <Route 
-          path="/" 
-          element={
-            <Home 
-              showKeyboard={showKeyboard}
-              showFingerLayout={showFingerLayout}
-              showHands={showHands}
-              textSource={textSource}
-              onSourceChange={setTextSource}
-            />
-          } 
-        />
-        <Route 
-          path="/practice" 
-          element={
-            <Practice 
-              showKeyboard={showKeyboard}
-              showFingerLayout={showFingerLayout}
-              showHands={showHands}
-            />
-          } 
-        />
-        <Route path="/auth" element={<Auth />} />
-        <Route 
-          path="/account" 
-          element={
-            <ProtectedRoute>
-              <Account />
-            </ProtectedRoute>
-          } 
-        />
-        <Route 
-          path="/teams" 
-          element={
-            <ProtectedRoute>
-              <Teams />
-            </ProtectedRoute>
-          } 
-        />
-      </Routes>
+      <PageWrapper>
+        <Routes>
+          <Route 
+            path="/" 
+            element={
+              <Home 
+                showKeyboard={showKeyboard}
+                showFingerLayout={showFingerLayout}
+                showHands={showHands}
+                textSource={textSource}
+                onSourceChange={setTextSource}
+              />
+            } 
+          />
+          <Route 
+            path="/practice" 
+            element={
+              <Practice 
+                showKeyboard={showKeyboard}
+                showFingerLayout={showFingerLayout}
+                showHands={showHands}
+              />
+            } 
+          />
+          <Route path="/auth" element={<Auth />} />
+          <Route 
+            path="/account" 
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/teams" 
+            element={
+              <ProtectedRoute>
+                <Teams />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </PageWrapper>
     </div>
   );
 }

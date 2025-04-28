@@ -1,0 +1,59 @@
+.page-wrapper {
+  height: calc(100vh - 72px) !important; /* 72px is the exact height of the navigation */
+  position: relative;
+}
+
+/* Custom scrollbar styles */
+.page-wrapper .scrollbar-thumb {
+  background-color: var(--accent-color) !important;
+  border-radius: 3px !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.page-wrapper .scrollbar-thumb:hover {
+  background-color: var(--accent-color-hover) !important;
+}
+
+.page-wrapper .scrollbar-track {
+  background-color: transparent !important;
+}
+
+/* Webkit scrollbar (Chrome, Safari, Edge) */
+.page-wrapper::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.page-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px 0;
+}
+
+.page-wrapper::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.page-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-color-hover);
+}
+
+/* Hide scrollbar when not hovering */
+.page-wrapper {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.page-wrapper::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Show scrollbar on hover */
+.page-wrapper:hover {
+  scrollbar-width: thin; /* Firefox */
+}
+
+.page-wrapper:hover::-webkit-scrollbar {
+  display: block; /* Chrome, Safari, Opera */
+} 

@@ -1,12 +1,14 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTeams } from '../contexts/TeamsContext';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './ResultsModal.css';
 
 const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false }) => {
   const { saveTestResults } = useAuth();
   const { currentTeam } = useTeams();
+  const location = useLocation();
   const MAX_WRONG_WORDS = 20;
   const wrongWords = stats.wrongWords.slice(0, MAX_WRONG_WORDS);
   const hasMoreWords = stats.wrongWords.length > MAX_WRONG_WORDS;
@@ -15,11 +17,13 @@ const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false })
   React.useEffect(() => {
     if (stats && !hasSavedRef.current) {
       hasSavedRef.current = true;
-      saveTestResults(stats, currentTeam?.id).catch(error => {
+      // Only save team stats if we're on the practice page
+      const teamId = location.pathname === '/practice' ? currentTeam?.id : null;
+      saveTestResults(stats, teamId).catch(error => {
         hasSavedRef.current = false; // Reset the flag if save fails
       });
     }
-  }, [stats, saveTestResults, currentTeam]);
+  }, [stats, saveTestResults, currentTeam, location.pathname]);
 
   return (
     <div className="modal-overlay">
