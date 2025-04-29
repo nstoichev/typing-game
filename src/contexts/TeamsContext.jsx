@@ -7,7 +7,8 @@ import {
   updateDoc, 
   arrayUnion,
   query,
-  getDoc
+  getDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from './AuthContext';
@@ -56,8 +57,24 @@ export function TeamsProvider({ children }) {
   // Function to create a new team
   const createTeam = async (teamName) => {
     try {
+      // Validate team name
+      const trimmedName = teamName.trim();
+      
+      if (trimmedName.length < 3) {
+        throw new Error('Team name must be at least 3 characters long');
+      }
+      
+      if (trimmedName.length > 50) {
+        throw new Error('Team name cannot exceed 50 characters');
+      }
+      
+      // Only allow alphanumeric characters, spaces, and basic punctuation
+      if (!/^[a-zA-Z0-9\s.,!?'"-]+$/.test(trimmedName)) {
+        throw new Error('Team name can only contain letters, numbers, spaces, and basic punctuation');
+      }
+
       const teamRef = await addDoc(collection(db, 'teams'), {
-        name: teamName,
+        name: trimmedName,
         createdAt: new Date(),
         members: [{
           id: currentUser.uid,
@@ -73,7 +90,7 @@ export function TeamsProvider({ children }) {
 
       const newTeam = {
         id: teamRef.id,
-        name: teamName,
+        name: trimmedName,
         members: [{
           id: currentUser.uid,
           name: currentUser.displayName || currentUser.email,
@@ -285,6 +302,34 @@ export function TeamsProvider({ children }) {
     }
   };
 
+  // Function to delete a team
+  const deleteTeam = async (teamId) => {
+    try {
+      const teamRef = doc(db, 'teams', teamId);
+      const teamDoc = await getDoc(teamRef);
+      
+      if (!teamDoc.exists()) {
+        throw new Error('Team not found');
+      }
+
+      const teamData = teamDoc.data();
+      const isMember = teamData.members.some(member => member.id === currentUser.uid);
+
+      if (!isMember) {
+        throw new Error('You are not a member of this team');
+      }
+
+      await deleteDoc(teamRef);
+      setTeams(prev => prev.filter(team => team.id !== teamId));
+      if (currentTeam?.id === teamId) {
+        setCurrentTeam(null);
+      }
+    } catch (error) {
+      console.error('Error deleting team:', error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     fetchUserTeams();
   }, [currentUser]);
@@ -304,7 +349,8 @@ export function TeamsProvider({ children }) {
     createTeam,
     joinTeam,
     updateTeamStats,
-    fetchUserTeams
+    fetchUserTeams,
+    deleteTeam
   };
 
   return (

@@ -48,15 +48,15 @@
 }
 
 .team-info--disabled {
-  background-color: #95a5a6;
+  display: none;
   opacity: 0.7;
   position: relative;
 }
 
 .team-info--disabled::after {
-  content: "Disabled";
+  content: "Team is disabled";
   position: absolute;
-  top: -20px;
+  bottom: -20px;
   left: 50%;
   transform: translateX(-50%);
   background-color: #e74c3c;

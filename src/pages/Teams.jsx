@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useTeams } from '../contexts/TeamsContext';
 import { useAuth } from '../contexts/AuthContext';
 import styles from './Teams.module.css';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Teams = () => {
-  const { teams = [], createTeam, joinTeam, currentTeam, setCurrentTeam, loading } = useTeams();
+  const { teams = [], createTeam, joinTeam, currentTeam, setCurrentTeam, loading, deleteTeam } = useTeams();
   const { currentUser } = useAuth();
   const [newTeamName, setNewTeamName] = useState('');
   const [joinTeamId, setJoinTeamId] = useState('');
@@ -12,6 +13,8 @@ const Teams = () => {
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [copiedTeamId, setCopiedTeamId] = useState(null);
   const [error, setError] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [teamToDelete, setTeamToDelete] = useState(null);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
@@ -53,6 +56,22 @@ const Teams = () => {
     setCurrentTeam(team);
   };
 
+  const handleDeleteTeam = async (team) => {
+    setTeamToDelete(team);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteTeam = async () => {
+    try {
+      await deleteTeam(teamToDelete.id);
+      setShowDeleteModal(false);
+      setTeamToDelete(null);
+      setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   if (!currentUser) {
     return <div className={styles.loading}>Please log in to access teams</div>;
   }
@@ -65,13 +84,23 @@ const Teams = () => {
     <div className="container">
       {showCreateForm && (
         <form onSubmit={handleCreateTeam} className="form">
-          <input
-            type="text"
-            value={newTeamName}
-            onChange={(e) => setNewTeamName(e.target.value)}
-            placeholder="Team name"
-            required
-          />
+          <div className={styles.inputGroup}>
+            <input
+              type="text"
+              value={newTeamName}
+              onChange={(e) => setNewTeamName(e.target.value)}
+              placeholder="Team name"
+              required
+            />
+            <div className={styles.helperText}>
+              <p>Team name requirements:</p>
+              <ul>
+                <li>3-50 characters long</li>
+                <li>Only letters, numbers, spaces, and basic punctuation (.,!?'"-)</li>
+                <li>No special characters or emojis</li>
+              </ul>
+            </div>
+          </div>
           <button type="submit" className="button">Create Team</button>
         </form>
       )}
@@ -153,15 +182,26 @@ const Teams = () => {
                   <span className={styles.statValue}>{team.bestWPM?.toFixed(1) || '0.0'}</span>
                 </div>
               </div>
-              <button 
-                className="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSelectTeam(team);
-                }}
-              >
-                {currentTeam?.id === team.id ? 'Selected' : 'Select Team'}
-              </button>
+              <div className={styles.cardActions}>
+                <button 
+                  className="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelectTeam(team);
+                  }}
+                >
+                  {currentTeam?.id === team.id ? 'Selected' : 'Select Team'}
+                </button>
+                <button 
+                  className="button button--danger"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTeam(team);
+                  }}
+                >
+                  Delete Team
+                </button>
+              </div>
             </div>
           ))
         )}
@@ -199,6 +239,17 @@ const Teams = () => {
           </div>
         </div>
       )}
+
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setTeamToDelete(null);
+        }}
+        onConfirm={confirmDeleteTeam}
+        title="Delete Team"
+        message={`Are you sure you want to delete the team "${teamToDelete?.name}"? This action cannot be undone.`}
+      />
     </div>
   );
 };
