@@ -60,7 +60,7 @@ function AppContent() {
             } 
           />
           <Route 
-            path="/practice" 
+            path="/speed-test" 
             element={
               <Practice 
                 showKeyboard={showKeyboard}

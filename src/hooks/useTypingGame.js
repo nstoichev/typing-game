@@ -147,7 +147,7 @@ export const useTypingGame = () => {
 
   const handleKeyDown = useCallback((e) => {
     // Only process events if we're on the home or practice page
-    if (location.pathname !== '/' && location.pathname !== '/practice') {
+    if (location.pathname !== '/' && location.pathname !== '/speed-test') {
       return;
     }
 

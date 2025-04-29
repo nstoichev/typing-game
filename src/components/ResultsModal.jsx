@@ -18,7 +18,7 @@ const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false })
     if (stats && !hasSavedRef.current) {
       hasSavedRef.current = true;
       // Only save team stats if we're on the practice page
-      const teamId = location.pathname === '/practice' ? currentTeam?.id : null;
+      const teamId = location.pathname === '/speed-test' ? currentTeam?.id : null;
       saveTestResults(stats, teamId).catch(error => {
         hasSavedRef.current = false; // Reset the flag if save fails
       });

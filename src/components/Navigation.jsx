@@ -35,7 +35,7 @@ const Navigation = ({
   };
 
   // Determine if we're on the practice page
-  const isPracticePage = location.pathname === '/practice';
+  const isPracticePage = location.pathname === '/speed-test';
 
   return (
     <nav className="navigation">
@@ -50,8 +50,8 @@ const Navigation = ({
         </li>
         <li>
           <Link 
-            to="/practice" 
-            className={`button ${location.pathname === '/practice' ? 'active' : ''}`}
+            to="/speed-test" 
+            className={`button ${location.pathname === '/speed-test' ? 'active' : ''}`}
           >
             Speed test
           </Link>

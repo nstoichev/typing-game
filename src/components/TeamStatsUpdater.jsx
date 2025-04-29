@@ -11,7 +11,7 @@ export default function TeamStatsUpdater() {
 
   useEffect(() => {
     // Only update team stats if we're on the practice page
-    if (location.pathname === '/practice' && currentUser && currentTeam && userData?.recentTests?.length > 0) {
+    if (location.pathname === '/speed-test' && currentUser && currentTeam && userData?.recentTests?.length > 0) {
       const latestTest = userData.recentTests[userData.recentTests.length - 1];
       
       // Only update if:
