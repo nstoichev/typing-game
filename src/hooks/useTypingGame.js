@@ -39,6 +39,9 @@ export const useTypingGame = () => {
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [totalWords, setTotalWords] = useState(0);
+  const [correctWords, setCorrectWords] = useState(0);
+  const [currentWrongWords, setCurrentWrongWords] = useState(new Set());
   const timerRef = useRef(null);
 
   const isValidText = (text) => {
@@ -207,6 +210,35 @@ export const useTypingGame = () => {
       const currentChar = text[currentChunkStartIndex + typedText.length];
       if (e.key !== currentChar) {
         setWrongChars(prev => prev + 1);
+        
+        // Get the current word being typed
+        const lastSpaceIndex = text.lastIndexOf(' ', currentChunkStartIndex + typedText.length);
+        const nextSpaceIndex = text.indexOf(' ', currentChunkStartIndex + typedText.length);
+        const currentWord = text.slice(
+          lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
+          nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
+        ).trim();
+
+        if (currentWord) {
+          setCurrentWrongWords(prev => new Set([...prev, currentWord]));
+        }
+      } else {
+        // If the character is correct, check if we need to remove the word from wrong words
+        const lastSpaceIndex = text.lastIndexOf(' ', currentChunkStartIndex + typedText.length);
+        const nextSpaceIndex = text.indexOf(' ', currentChunkStartIndex + typedText.length);
+        const currentWord = text.slice(
+          lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
+          nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
+        ).trim();
+
+        // Check if the word is complete and correct
+        if (currentWord && newTypedText.endsWith(currentWord)) {
+          setCurrentWrongWords(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(currentWord);
+            return newSet;
+          });
+        }
       }
       
       if (newTypedText.length === currentChunk.length) {
@@ -226,18 +258,6 @@ export const useTypingGame = () => {
         setCurrentChunkStartIndex(nextChunkStart);
         setTypedText('');
       }
-
-      if (e.key !== text[currentChunkStartIndex + typedText.length]) {
-        const lastSpaceIndex = text.lastIndexOf(' ', currentChunkStartIndex + typedText.length);
-        const nextSpaceIndex = text.indexOf(' ', currentChunkStartIndex + typedText.length);
-        const currentWord = text.slice(
-          lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
-          nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
-        );
-        if (currentWord.trim() && !wrongWords.includes(currentWord)) {
-          setWrongWords(prev => [...prev, currentWord]);
-        }
-      }
     }
   }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete, wrongWords, location]);
 
@@ -254,6 +274,7 @@ export const useTypingGame = () => {
     setIsActive(false);
     setStats(null);
     setStartTime(null);
+    setCurrentWrongWords(new Set());
     const firstChunk = getChunkWithWordBoundary(text, 0);
     setCurrentChunk(firstChunk.chunk);
     const secondChunk = getChunkWithWordBoundary(text, firstChunk.endIndex);
@@ -276,15 +297,23 @@ export const useTypingGame = () => {
   useEffect(() => {
     const calculateStats = (timeInMinutes) => {
       const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
-      const textLength = totalTypedText.length;
-      const wpm = Math.round((textLength / 5) / timeInMinutes);
-      const accuracy = Math.round(((textLength - wrongChars) / textLength) * 100);
+      const wordStats = calculateWordStats(typedText, currentChunkStartIndex);
+      
+      // Calculate WPM based on correct words instead of character count
+      const wpm = Math.round(wordStats.correctWords / timeInMinutes);
+      const accuracy = Math.round(((totalTypedText.length - wrongChars) / totalTypedText.length) * 100);
       
       const stats = {
         wpm,
         accuracy,
-        wrongWords: [...new Set(wrongWords)]
+        wrongWords: Array.from(currentWrongWords),
+        ...wordStats
       };
+      
+      console.log('Typing Stats:', {
+        ...wordStats,
+        wrongWords: Array.from(currentWrongWords)
+      });
       
       setStats(stats);
       setIsComplete(true);
@@ -329,6 +358,9 @@ export const useTypingGame = () => {
     setIsActive(false);
     setStats(null);
     setStartTime(null);
+    setTotalWords(0);
+    setCorrectWords(0);
+    setCurrentWrongWords(new Set());
 
     try {
       let newText;
@@ -380,6 +412,26 @@ export const useTypingGame = () => {
       setIsLoading(false);
     }
   };
+
+  const calculateWordStats = useCallback((typedText, currentChunkStartIndex) => {
+    const allText = text.slice(0, currentChunkStartIndex) + typedText;
+    const words = allText.trim().split(/\s+/);
+    
+    // Count total words (excluding empty strings)
+    const totalWordsCount = words.filter(word => word.length > 0).length;
+    
+    // Count wrong words (words that are in currentWrongWords)
+    const wrongWordsCount = Array.from(currentWrongWords).length;
+    
+    // Calculate correct words by subtracting wrong words from total
+    const correctWordsCount = totalWordsCount - wrongWordsCount;
+
+    return {
+      totalWords: totalWordsCount,
+      correctWords: correctWordsCount,
+      wrongWordsCount: wrongWordsCount
+    };
+  }, [text, currentWrongWords]);
 
   return {
     currentChunk,
