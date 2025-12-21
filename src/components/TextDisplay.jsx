@@ -52,9 +52,15 @@ const TextDisplay = ({ currentChunk, nextChunk, typedText, isLoading }) => {
         const absoluteIndex = wordStart + charIndex;
         return absoluteIndex < typedText.length && typedText[absoluteIndex] !== char;
       });
+
+      // Check if the word is completely typed and correct
+      const isCompleteAndCorrect = wordStart + wordLength <= typedText.length && !hasWrongChars;
+      
+      // Only apply success class in words highlight mode
+      const showSuccess = highlightMode === 'words' && isCompleteAndCorrect;
       
       const wordElement = (
-        <span key={wordIndex} className={`${styles.word} ${isCurrentWord ? styles.active : ''} ${hasWrongChars ? styles.wrong : ''}`}>
+        <span key={wordIndex} className={`${styles.word} ${isCurrentWord ? styles.active : ''} ${hasWrongChars ? styles.wrong : ''} ${showSuccess ? styles.success : ''}`}>
           {chars.map((char, charIndex) => {
             const absoluteIndex = wordStart + charIndex;
             const isTyped = absoluteIndex < typedText.length;
