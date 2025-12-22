@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useTeams } from '../contexts/TeamsContext';
 import words from '../jsons/words.json';
 
 const CHUNK_SIZE = 100;
@@ -23,8 +21,6 @@ const VALID_TYPING_KEYS = new Set([
 
 export const useTypingGame = () => {
   const location = useLocation();
-  const { saveTestResults } = useAuth();
-  const { currentTeam } = useTeams();
   const [text, setText] = useState('');
   const [currentChunk, setCurrentChunk] = useState('');
   const [nextChunk, setNextChunk] = useState('');
