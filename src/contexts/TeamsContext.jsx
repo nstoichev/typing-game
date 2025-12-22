@@ -12,7 +12,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useAuth } from './AuthContext';
-import { getAuth } from 'firebase/auth';
 
 const TeamsContext = createContext();
 
@@ -25,35 +24,6 @@ export function TeamsProvider({ children }) {
   const [currentTeam, setCurrentTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const { currentUser } = useAuth();
-  const auth = getAuth();
-
-  // Function to get user display name
-  const getUserDisplayName = async (userId) => {
-    try {
-      // First try to get from Firebase Auth for current user
-      const user = auth.currentUser;
-      
-      if (user && user.uid === userId) {
-        return user.displayName || user.email || 'Unknown';
-      }
-
-      // For other users, try Firestore
-      const userRef = doc(db, 'users', userId);
-      const userDoc = await getDoc(userRef);
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        // Return displayName if it exists, otherwise try email or fallback to Unknown
-        const displayName = userData.displayName || userData.email || 'Unknown';
-        return displayName;
-      }
-
-      return 'Unknown';
-    } catch (error) {
-      return 'Unknown';
-    }
-  };
-
   // Function to create a new team
   const createTeam = async (teamName) => {
     try {
@@ -302,8 +272,8 @@ export function TeamsProvider({ children }) {
     }
   };
 
-  // Function to delete a team
-  const deleteTeam = async (teamId) => {
+  // Function to leave a team
+  const leaveTeam = async (teamId) => {
     try {
       const teamRef = doc(db, 'teams', teamId);
       const teamDoc = await getDoc(teamRef);
@@ -313,19 +283,52 @@ export function TeamsProvider({ children }) {
       }
 
       const teamData = teamDoc.data();
-      const isMember = teamData.members.some(member => member.id === currentUser.uid);
+      const memberToRemove = teamData.members.find(member => member.id === currentUser.uid);
 
-      if (!isMember) {
+      if (!memberToRemove) {
         throw new Error('You are not a member of this team');
       }
 
-      await deleteDoc(teamRef);
+      // If user is the only member, delete the team instead
+      if (teamData.members.length === 1) {
+        await deleteDoc(teamRef);
+        setTeams(prev => prev.filter(team => team.id !== teamId));
+        if (currentTeam?.id === teamId) {
+          setCurrentTeam(null);
+        }
+        return;
+      }
+
+      // Remove the user from members array
+      const remainingMembers = teamData.members.filter(member => member.id !== currentUser.uid);
+
+      // Recalculate team stats from remaining members (same logic as fetchUserTeams)
+      const teamStats = remainingMembers.reduce((acc, member) => {
+        const memberTests = member.totalTests || 0;
+        const memberAvgWPM = member.averageWPM || 0;
+        acc.totalTests += memberTests;
+        acc.totalWPM += memberAvgWPM * memberTests;
+        acc.bestWPM = Math.max(acc.bestWPM, member.bestWPM || 0);
+        return acc;
+      }, { totalTests: 0, totalWPM: 0, bestWPM: 0 });
+
+      const averageWPM = teamStats.totalTests > 0 ? teamStats.totalWPM / teamStats.totalTests : 0;
+
+      // Update the team document
+      await updateDoc(teamRef, {
+        members: remainingMembers,
+        totalTests: teamStats.totalTests,
+        averageWPM: averageWPM,
+        bestWPM: teamStats.bestWPM
+      });
+
+      // Update local state - remove team from user's teams list
       setTeams(prev => prev.filter(team => team.id !== teamId));
       if (currentTeam?.id === teamId) {
         setCurrentTeam(null);
       }
     } catch (error) {
-      console.error('Error deleting team:', error);
+      console.error('Error leaving team:', error);
       throw error;
     }
   };
@@ -350,7 +353,7 @@ export function TeamsProvider({ children }) {
     joinTeam,
     updateTeamStats,
     fetchUserTeams,
-    deleteTeam
+    leaveTeam
   };
 
   return (

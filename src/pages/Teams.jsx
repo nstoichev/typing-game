@@ -5,7 +5,7 @@ import styles from './Teams.module.css';
 import ConfirmationModal from '../components/ConfirmationModal';
 
 const Teams = () => {
-  const { teams = [], createTeam, joinTeam, currentTeam, setCurrentTeam, loading, deleteTeam } = useTeams();
+  const { teams = [], createTeam, joinTeam, currentTeam, setCurrentTeam, loading, leaveTeam } = useTeams();
   const { currentUser } = useAuth();
   const [newTeamName, setNewTeamName] = useState('');
   const [joinTeamId, setJoinTeamId] = useState('');
@@ -13,8 +13,8 @@ const Teams = () => {
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [copiedTeamId, setCopiedTeamId] = useState(null);
   const [error, setError] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [teamToDelete, setTeamToDelete] = useState(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [teamToLeave, setTeamToLeave] = useState(null);
 
   const handleCreateTeam = async (e) => {
     e.preventDefault();
@@ -56,16 +56,16 @@ const Teams = () => {
     setCurrentTeam(team);
   };
 
-  const handleDeleteTeam = async (team) => {
-    setTeamToDelete(team);
-    setShowDeleteModal(true);
+  const handleLeaveTeam = async (team) => {
+    setTeamToLeave(team);
+    setShowLeaveModal(true);
   };
 
-  const confirmDeleteTeam = async () => {
+  const confirmLeaveTeam = async () => {
     try {
-      await deleteTeam(teamToDelete.id);
-      setShowDeleteModal(false);
-      setTeamToDelete(null);
+      await leaveTeam(teamToLeave.id);
+      setShowLeaveModal(false);
+      setTeamToLeave(null);
       setError('');
     } catch (err) {
       setError(err.message);
@@ -196,10 +196,10 @@ const Teams = () => {
                   className="button button--danger"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleDeleteTeam(team);
+                    handleLeaveTeam(team);
                   }}
                 >
-                  Delete Team
+                  Leave Team
                 </button>
               </div>
             </div>
@@ -241,14 +241,14 @@ const Teams = () => {
       )}
 
       <ConfirmationModal
-        isOpen={showDeleteModal}
+        isOpen={showLeaveModal}
         onClose={() => {
-          setShowDeleteModal(false);
-          setTeamToDelete(null);
+          setShowLeaveModal(false);
+          setTeamToLeave(null);
         }}
-        onConfirm={confirmDeleteTeam}
-        title="Delete Team"
-        message={`Are you sure you want to delete the team "${teamToDelete?.name}"? This action cannot be undone.`}
+        onConfirm={confirmLeaveTeam}
+        title="Leave Team"
+        message={`Are you sure you want to leave the team "${teamToLeave?.name}"? You can rejoin later using the Team ID.`}
       />
     </div>
   );
