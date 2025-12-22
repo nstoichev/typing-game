@@ -141,6 +141,20 @@ export const useTypingGame = () => {
     return currentText;
   };
 
+  // Helper function to get current word boundaries
+  const getCurrentWord = useCallback((text, position, chunkStartIndex, chunkLength) => {
+    const lastSpaceIndex = text.lastIndexOf(' ', position);
+    const nextSpaceIndex = text.indexOf(' ', position);
+    return {
+      word: text.slice(
+        lastSpaceIndex === -1 ? chunkStartIndex : lastSpaceIndex + 1,
+        nextSpaceIndex === -1 ? chunkStartIndex + chunkLength : nextSpaceIndex
+      ).trim(),
+      startPos: lastSpaceIndex === -1 ? chunkStartIndex : lastSpaceIndex + 1,
+      endPos: nextSpaceIndex === -1 ? chunkStartIndex + chunkLength : nextSpaceIndex
+    };
+  }, []);
+
   const handleKeyDown = useCallback((e) => {
     // Only process events if we're on the home or practice page
     if (location.pathname !== '/' && location.pathname !== '/speed-test') {
@@ -192,23 +206,9 @@ export const useTypingGame = () => {
           setWrongChars(prev => Math.max(0, prev - 1));
         }
         
-        // Helper function to get current word boundaries
-        const getCurrentWord = (position) => {
-          const lastSpaceIndex = text.lastIndexOf(' ', position);
-          const nextSpaceIndex = text.indexOf(' ', position);
-          return {
-            word: text.slice(
-              lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
-              nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
-            ).trim(),
-            startPos: lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
-            endPos: nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
-          };
-        };
-        
         // Check if word is now correct after backspace correction
         const currentPosition = currentChunkStartIndex + newTypedText.length;
-        const wordInfo = getCurrentWord(currentPosition);
+        const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
         if (wordInfo.word) {
           // Get the typed portion of the current word
           const typedWordStart = Math.max(0, newTypedText.lastIndexOf(' ') + 1);
@@ -230,24 +230,10 @@ export const useTypingGame = () => {
       const newTypedText = typedText + e.key;
       setTypedText(newTypedText);
       
-      // Helper function to get current word boundaries
-      const getCurrentWord = (position) => {
-        const lastSpaceIndex = text.lastIndexOf(' ', position);
-        const nextSpaceIndex = text.indexOf(' ', position);
-        return {
-          word: text.slice(
-            lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
-            nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
-          ).trim(),
-          startPos: lastSpaceIndex === -1 ? currentChunkStartIndex : lastSpaceIndex + 1,
-          endPos: nextSpaceIndex === -1 ? currentChunkStartIndex + currentChunk.length : nextSpaceIndex
-        };
-      };
-      
       const currentChar = text[currentChunkStartIndex + typedText.length];
       const isWrong = e.key !== currentChar;
       const currentPosition = currentChunkStartIndex + typedText.length;
-      const wordInfo = getCurrentWord(currentPosition);
+      const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
       
       // Combined check: handle wrong character and wrong word tracking together
       if (isWrong) {
@@ -299,7 +285,7 @@ export const useTypingGame = () => {
         setTypedText('');
       }
     }
-  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete, wrongWords, location]);
+  }, [text, typedText, currentChunk, isActive, currentChunkStartIndex, countdown, isComplete, wrongWords, location, getCurrentWord]);
 
   const handleTryAgain = () => {
     // Clear the timer
