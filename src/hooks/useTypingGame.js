@@ -324,75 +324,7 @@ export const useTypingGame = () => {
     setTextSource(newSource);
   };
 
-  useEffect(() => {
-    initializeText();
-  }, [textSource]);
-
-  useEffect(() => {
-    const calculateStats = (timeInMinutes) => {
-      const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
-      const textLength = totalTypedText.length;
-      const correctChars = textLength - wrongChars;
-      const wpm = Math.round((correctChars / 5) / timeInMinutes);
-      const accuracy = textLength > 0 
-      ? Math.round(((textLength - wrongChars) / textLength) * 100)
-      : 0;
-      
-      const stats = {
-        wpm,
-        accuracy,
-        wrongWords: [...new Set(wrongWords)]
-      };
-      
-      setStats(stats);
-      setIsComplete(true);
-    };
-
-    // Normal mode - when completing the entire text
-    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0 && countdown === null) {
-      const endTime = Date.now();
-      if (!startTime) return;
-      const timeInMinutes = (endTime - startTime) / 60000;
-      calculateStats(timeInMinutes);
-    }
-    // Countdown mode - when timer reaches 0
-    else if (countdown === 0 && !isComplete) {
-      // Use the initial countdown value to calculate time in minutes
-      const initialCountdown = initialCountdownRef.current || 60; // Fallback to 60 if not set
-      const timeInMinutes = initialCountdown / 60;
-      calculateStats(timeInMinutes);
-      setIsActive(false);
-      initialCountdownRef.current = null; // Reset after calculation
-    }
-  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, []);
-
-  // Clear timer when countdown changes to null or resets
-  useEffect(() => {
-    if (countdown === null && timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-      initialCountdownRef.current = null;
-    }
-  }, [countdown]);
-
-  const initializeText = async () => {
+  const initializeText = useCallback(async () => {
     setIsLoading(true);
     // Clear any existing timer
     if (timerRef.current) {
@@ -462,7 +394,75 @@ export const useTypingGame = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [textSource, countdown]);
+
+  useEffect(() => {
+    initializeText();
+  }, [textSource, initializeText]);
+
+  useEffect(() => {
+    const calculateStats = (timeInMinutes) => {
+      const totalTypedText = text.slice(0, currentChunkStartIndex) + typedText;
+      const textLength = totalTypedText.length;
+      const correctChars = textLength - wrongChars;
+      const wpm = Math.round((correctChars / 5) / timeInMinutes);
+      const accuracy = textLength > 0 
+      ? Math.round(((textLength - wrongChars) / textLength) * 100)
+      : 0;
+      
+      const stats = {
+        wpm,
+        accuracy,
+        wrongWords: [...new Set(wrongWords)]
+      };
+      
+      setStats(stats);
+      setIsComplete(true);
+    };
+
+    // Normal mode - when completing the entire text
+    if (currentChunkStartIndex + typedText.length === text.length && text.length > 0 && countdown === null) {
+      const endTime = Date.now();
+      if (!startTime) return;
+      const timeInMinutes = (endTime - startTime) / 60000;
+      calculateStats(timeInMinutes);
+    }
+    // Countdown mode - when timer reaches 0
+    else if (countdown === 0 && !isComplete) {
+      // Use the initial countdown value to calculate time in minutes
+      const initialCountdown = initialCountdownRef.current || 60; // Fallback to 60 if not set
+      const timeInMinutes = initialCountdown / 60;
+      calculateStats(timeInMinutes);
+      setIsActive(false);
+      initialCountdownRef.current = null; // Reset after calculation
+    }
+  }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Clear timer when countdown changes to null or resets
+  useEffect(() => {
+    if (countdown === null && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+      initialCountdownRef.current = null;
+    }
+  }, [countdown]);
 
   return {
     currentChunk,
