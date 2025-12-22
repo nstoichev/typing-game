@@ -73,15 +73,18 @@
 }
 
 .highlight {
-  background-color: #4a9eff !important;
-  transform: translateY(2px);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.4),
-              inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-color: #5aafff;
+  background-color: #333 !important;
+  transform: translateY(-2px) translateX(-2px);
+  box-shadow: 0 0 8px rgba(74, 158, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: #fff;
+  color: #fff;
+  font-size: 18px;
+  text-shadow: 4px 4px 1px #000;
+  overflow: hidden;
 }
 
 .highlight::after {
-  opacity: 0;
+  background: rgba(0, 0, 0, 1);
 }
 
 .dualChar {

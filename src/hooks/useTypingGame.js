@@ -36,6 +36,7 @@ export const useTypingGame = () => {
   const [countdown, setCountdown] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef(null);
+  const initialCountdownRef = useRef(null);
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -173,16 +174,23 @@ export const useTypingGame = () => {
     if (!isActive && isValidTypingKey) {
       setIsActive(true);
       setStartTime(Date.now());
-      if (countdown === 60) {
+      // Start countdown timer if countdown is set
+      if (countdown !== null && countdown > 0) {
+        // Store initial countdown value for WPM calculation
+        initialCountdownRef.current = countdown;
         // Clear any existing timer
         if (timerRef.current) {
           clearInterval(timerRef.current);
+          timerRef.current = null;
         }
         timerRef.current = setInterval(() => {
           setCountdown(prev => {
-            if (prev <= 0) {
-              clearInterval(timerRef.current);
-              return null;
+            if (prev === null || prev <= 0) {
+              if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+              }
+              return 0;
             }
             return prev - 1;
           });
@@ -293,6 +301,7 @@ export const useTypingGame = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    initialCountdownRef.current = null;
     setTypedText('');
     setWrongWords([]);
     setWrongChars(0);
@@ -348,8 +357,12 @@ export const useTypingGame = () => {
     }
     // Countdown mode - when timer reaches 0
     else if (countdown === 0 && !isComplete) {
-      calculateStats(1); // Exactly 1 minute for countdown mode
+      // Use the initial countdown value to calculate time in minutes
+      const initialCountdown = initialCountdownRef.current || 60; // Fallback to 60 if not set
+      const timeInMinutes = initialCountdown / 60;
+      calculateStats(timeInMinutes);
       setIsActive(false);
+      initialCountdownRef.current = null; // Reset after calculation
     }
   }, [typedText, text, wrongWords, currentChunkStartIndex, startTime, countdown, isComplete, wrongChars]);
 
@@ -360,6 +373,25 @@ export const useTypingGame = () => {
     };
   }, [handleKeyDown]);
 
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Clear timer when countdown changes to null or resets
+  useEffect(() => {
+    if (countdown === null && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+      initialCountdownRef.current = null;
+    }
+  }, [countdown]);
+
   const initializeText = async () => {
     setIsLoading(true);
     // Clear any existing timer
@@ -367,6 +399,7 @@ export const useTypingGame = () => {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+    initialCountdownRef.current = null;
 
     // Clear existing text while loading
     setText('');
