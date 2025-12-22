@@ -1,0 +1,30 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own data
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Users can create/update their own document
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Teams collection
+    match /teams/{teamId} {
+      // Authenticated users can read all teams (app filters client-side)
+      allow read: if request.auth != null;
+      
+      // Authenticated users can create teams (must be first member)
+      allow create: if request.auth != null &&
+        request.resource.data.members[0].id == request.auth.uid;
+      
+      // Authenticated users can update teams (app logic enforces membership)
+      allow update: if request.auth != null;
+      
+      // Authenticated users can delete teams (app logic enforces membership)
+      allow delete: if request.auth != null;
+    }
+  }
+}
+
