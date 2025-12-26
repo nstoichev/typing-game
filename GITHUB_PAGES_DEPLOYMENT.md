@@ -182,11 +182,54 @@ This method allows you to manually deploy whenever you want.
 2. Check that `HashRouter` is being used in `src/App.jsx`
 3. Clear your browser cache and try again
 
-### Build Errors
+### Build Errors / Deployment Failed
 
-1. Run `npm run build` locally to check for build errors
-2. Check that all dependencies are installed: `npm install`
-3. Review the error messages in GitHub Actions (if using Option 1)
+**Error:** "Разгръщане в GitHub Pages / build - Неуспешно" (Deployment failed)
+
+**How to see the actual error:**
+1. Go to your repository: `https://github.com/nstoichev/typing-game`
+2. Click on the **Actions** tab
+3. Click on the failed workflow run (it will have a red X)
+4. Click on the **build** job (left sidebar)
+5. Expand each step to see the error messages
+6. Look for red error messages - they will tell you what went wrong
+
+**Common causes and solutions:**
+
+1. **Build script fails:**
+   - Test locally first: `npm run build`
+   - Fix any errors that appear
+   - Common issues: syntax errors, missing imports, type errors
+
+2. **Missing dependencies:**
+   - Make sure `package.json` and `package-lock.json` are committed
+   - The workflow uses `npm ci` which requires `package-lock.json`
+   - If you don't have `package-lock.json`, run `npm install` locally and commit it
+
+3. **ESLint errors (if linting is part of build):**
+   - Check if your build script includes linting
+   - Fix linting errors or temporarily disable strict linting
+
+4. **Node version mismatch:**
+   - The workflow uses Node.js 20
+   - Make sure your code works with Node.js 20
+   - You can test locally with the same Node version
+
+5. **Missing files:**
+   - Make sure all source files are committed to git
+   - Check that `vite.config.js` exists and is correct
+   - Verify `index.html` is in the root directory
+
+**Quick fix steps:**
+```bash
+# 1. Test build locally
+npm run build
+
+# 2. If build succeeds locally but fails on GitHub:
+#    - Make sure package-lock.json is committed
+#    - Check the Actions tab for specific error messages
+#    - Compare your local environment with GitHub Actions
+```
 
 ### 'gh-pages' is not recognized
 
