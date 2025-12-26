@@ -79,16 +79,27 @@ This method allows you to manually deploy whenever you want.
 
 #### Step 1: Install Dependencies
 
+**⚠️ IMPORTANT: You must install dependencies first before running the deploy command!**
+
 1. Open your terminal/command prompt
 2. Navigate to your project directory:
    ```bash
    cd D:\Server\Projects\typing-game-git\typing-game
    ```
 
-3. Install the gh-pages package:
+3. Install all dependencies (including the new `gh-pages` package):
    ```bash
    npm install
    ```
+   
+   This will install all packages including `gh-pages` which is needed for deployment.
+
+4. Verify installation (optional):
+   ```bash
+   npm list gh-pages
+   ```
+   
+   You should see `gh-pages@6.1.1` (or similar version) listed.
 
 #### Step 2: Build and Deploy
 
@@ -96,6 +107,8 @@ This method allows you to manually deploy whenever you want.
    ```bash
    npm run deploy
    ```
+   
+   **Note:** If you get an error saying `'gh-pages' is not recognized`, make sure you've completed Step 1 above.
 
    This command will:
    - Build your production-ready app
@@ -166,6 +179,23 @@ This method allows you to manually deploy whenever you want.
 1. Run `npm run build` locally to check for build errors
 2. Check that all dependencies are installed: `npm install`
 3. Review the error messages in GitHub Actions (if using Option 1)
+
+### 'gh-pages' is not recognized
+
+**Error:** `'gh-pages' is not recognized as an internal or external command`
+
+**Solution:**
+1. Make sure you've installed dependencies first:
+   ```bash
+   npm install
+   ```
+2. Wait for the installation to complete
+3. Then run the deploy command again:
+   ```bash
+   npm run deploy
+   ```
+
+**Why this happens:** The `gh-pages` package needs to be installed in `node_modules` before you can use it. Running `npm install` will install all packages listed in `package.json`, including `gh-pages`.
 
 ### Assets Not Loading
 
