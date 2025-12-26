@@ -46,6 +46,12 @@ jobs:
             echo "Error: dist/index.html was not created"
             exit 1
           fi
+      
+      - name: Ensure .nojekyll exists
+        run: |
+          # Create .nojekyll file to disable Jekyll processing
+          touch dist/.nojekyll
+          echo ".nojekyll file created to disable Jekyll processing"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

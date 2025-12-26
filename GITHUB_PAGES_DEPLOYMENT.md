@@ -18,6 +18,7 @@ The following changes have been made to prepare your project for GitHub Pages:
 3. **package.json**: Added `gh-pages` package and deploy script
 4. **.github/workflows/deploy.yml**: Created GitHub Actions workflow for automatic deployment
 5. **public/404.html**: Added fallback page for client-side routing
+6. **public/.nojekyll**: Added to disable Jekyll processing (Jekyll breaks Vite builds)
 
 ## Deployment Methods
 
@@ -281,14 +282,23 @@ npm run build
    - Make sure your repository name matches exactly: `typing-game`
    - If your repo name is different, update the base path accordingly
 
-5. **Cache issues:**
+5. **Jekyll processing breaking the build:**
+   - GitHub Pages uses Jekyll by default, which can break Vite builds
+   - The `.nojekyll` file should disable this, but verify it exists in your `dist` folder
+   - If you see a "jekyll-gh-pages.yml" workflow in Actions, you can disable it:
+     - Go to **Settings** → **Pages**
+     - Make sure **GitHub Actions** is selected (not Jekyll)
+     - Delete any Jekyll workflow files from `.github/workflows/` if they exist
+
+6. **Cache issues:**
    - Clear your browser cache
    - Try opening in an incognito/private window
    - GitHub Pages can take a few minutes to update after deployment
 
-6. **Verify deployment:**
+7. **Verify deployment:**
    - After the workflow completes, wait 1-2 minutes
    - Check the Actions tab - the workflow should show "Deploy to GitHub Pages" step as completed
+   - Make sure you're using the correct workflow (not Jekyll)
    - Visit: `https://nstoichev.github.io/typing-game/` (note the trailing slash)
 
 ## Testing Locally
