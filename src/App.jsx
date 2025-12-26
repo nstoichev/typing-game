@@ -1,5 +1,5 @@
 import './App.css'
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
 import ActionButtons from './components/ActionButtons'
 import TextDisplay from './components/TextDisplay'
