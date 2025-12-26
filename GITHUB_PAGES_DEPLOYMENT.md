@@ -64,8 +64,16 @@ This method automatically deploys your site whenever you push to the `main` bran
 2. Click on the **Actions** tab
 3. You should see a workflow run called "Deploy to GitHub Pages"
 4. Wait for it to complete (usually takes 1-2 minutes)
-5. Once complete, go back to **Settings** → **Pages**
+   - You'll see a yellow dot while it's running
+   - A green checkmark means it succeeded
+   - A red X means it failed (click to see errors)
+5. Once complete with a green checkmark, wait an additional 1-2 minutes for GitHub Pages to update
 6. Your site will be available at: `https://nstoichev.github.io/typing-game/`
+
+**Important:** If you see 404 errors:
+- Make sure GitHub Pages is set to use **GitHub Actions** (not a branch)
+- Check the Actions tab to ensure the workflow completed successfully
+- Wait a few minutes - GitHub Pages can take time to propagate
 
 #### Step 4: Verify Deployment
 
@@ -197,11 +205,48 @@ This method allows you to manually deploy whenever you want.
 
 **Why this happens:** The `gh-pages` package needs to be installed in `node_modules` before you can use it. Running `npm install` will install all packages listed in `package.json`, including `gh-pages`.
 
-### Assets Not Loading
+### Assets Not Loading / 404 Errors on GitHub Pages
 
-1. Verify the base path in `vite.config.js` is correct
-2. Check that all asset paths are relative (not absolute)
-3. Ensure the `public` folder contents are being copied correctly
+**Symptoms:** Site works with `npm run preview` but shows 404 errors on GitHub Pages
+
+**Possible Causes & Solutions:**
+
+1. **GitHub Pages not enabled or configured incorrectly:**
+   - Go to your repository: `https://github.com/nstoichev/typing-game`
+   - Click **Settings** → **Pages**
+   - Under **Source**, make sure **GitHub Actions** is selected (NOT "Deploy from a branch")
+   - If it's not set to GitHub Actions, change it and save
+
+2. **Deployment hasn't completed:**
+   - Go to **Actions** tab in your repository
+   - Check if there's a workflow run for "Deploy to GitHub Pages"
+   - If there's no workflow run, you need to push your changes first
+   - If there's a failed workflow, check the error messages
+
+3. **Workflow hasn't run yet:**
+   - Make sure you've pushed the `.github/workflows/deploy.yml` file
+   - Push your changes:
+     ```bash
+     git add .
+     git commit -m "Add GitHub Pages deployment"
+     git push origin main
+     ```
+   - Wait for the workflow to complete (check the Actions tab)
+
+4. **Base path mismatch:**
+   - Verify `vite.config.js` has `base: '/typing-game/'`
+   - Make sure your repository name matches exactly: `typing-game`
+   - If your repo name is different, update the base path accordingly
+
+5. **Cache issues:**
+   - Clear your browser cache
+   - Try opening in an incognito/private window
+   - GitHub Pages can take a few minutes to update after deployment
+
+6. **Verify deployment:**
+   - After the workflow completes, wait 1-2 minutes
+   - Check the Actions tab - the workflow should show "Deploy to GitHub Pages" step as completed
+   - Visit: `https://nstoichev.github.io/typing-game/` (note the trailing slash)
 
 ## Testing Locally
 
