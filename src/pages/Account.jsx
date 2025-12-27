@@ -83,6 +83,42 @@ const Account = () => {
     }
   };
 
+  const handleShowWordWPMChange = async (enabled) => {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        showWordWPM: enabled
+      });
+      
+      setUserData(prev => ({
+        ...prev,
+        showWordWPM: enabled
+      }));
+    } catch (error) {
+      console.error('Error updating show word WPM setting:', error);
+    }
+  };
+
+  const handleKeyboardWordHighlightChange = async (mode) => {
+    if (!currentUser) return;
+    
+    try {
+      const userRef = doc(db, 'users', currentUser.uid);
+      await updateDoc(userRef, {
+        keyboardWordHighlight: mode
+      });
+      
+      setUserData(prev => ({
+        ...prev,
+        keyboardWordHighlight: mode
+      }));
+    } catch (error) {
+      console.error('Error updating keyboard word highlight setting:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={css['account-container']}>
@@ -139,35 +175,7 @@ const Account = () => {
             </div>
           )}
         </div>
-
-        {/* Activity Section */}
-        <div className={css['account-section']}>
-          <div 
-            className={css['section-header']}
-            onClick={() => toggleSection('activity')}
-          >
-            <h2>Recent Activity</h2>
-            <span className={`${css['arrow']} ${expandedSections.activity ? css['expanded'] : ''}`}>▼</span>
-          </div>
-          {expandedSections.activity && (
-            <div className={css['section-content']}>
-              <div className={css['activity-list']}>
-                {userData?.recentTests?.slice(-10).reverse().map((test, index) => (
-                  <div key={index} className={css['activity-item']}>
-                    <div className={css['activity-date']}>
-                      {new Date(test.timestamp).toLocaleDateString()} at{' '}
-                      {new Date(test.timestamp).toLocaleTimeString()}
-                    </div>
-                    <div className={css['activity-stats']}>
-                      {test.wpm} WPM • {test.accuracy}% accuracy
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
+                
         {/* Preferences Section */}
         <div className={css['account-section']}>
           <div 
@@ -207,7 +215,7 @@ const Account = () => {
                 </div>
                 <div className={css['preference-item']}>
                   <span className={css['preference-label']}>Sound Effects</span>
-                  <span className={css['preference-value']}>On</span>
+                  <span className={css['preference-value']}>Unavailable</span>
                 </div>
                 <div className={css['preference-item']}>
                   <span className={css['preference-label']}>Keyboard Layout</span>
@@ -238,6 +246,70 @@ const Account = () => {
                     </label>
                   </div>
                 </div>
+                <div className={css['preference-item']}>
+                  <span className={css['preference-label']}>Show WPM for each word</span>
+                  <label className={css['checkbox-label']}>
+                    <input
+                      type="checkbox"
+                      checked={userData?.showWordWPM !== false}
+                      onChange={(e) => handleShowWordWPMChange(e.target.checked)}
+                    />
+                    <span></span>
+                  </label>
+                </div>
+                <div className={css['preference-item']}>
+                  <span className={css['preference-label']}>Keyboard Highlight</span>
+                  <div className={css['radio-group']}>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="keyboardWordHighlight"
+                        value="nextKey"
+                        checked={userData?.keyboardWordHighlight === 'fullWord' ? false : true}
+                        onChange={(e) => handleKeyboardWordHighlightChange('nextKey')}
+                      />
+                      <span>Next Key</span>
+                    </label>
+                    <label className={css['radio-label']}>
+                      <input
+                        type="radio"
+                        name="keyboardWordHighlight"
+                        value="fullWord"
+                        checked={userData?.keyboardWordHighlight === 'fullWord'}
+                        onChange={(e) => handleKeyboardWordHighlightChange('fullWord')}
+                      />
+                      <span>Full Word</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Activity Section */}
+        <div className={css['account-section']}>
+          <div 
+            className={css['section-header']}
+            onClick={() => toggleSection('activity')}
+          >
+            <h2>Recent Activity</h2>
+            <span className={`${css['arrow']} ${expandedSections.activity ? css['expanded'] : ''}`}>▼</span>
+          </div>
+          {expandedSections.activity && (
+            <div className={css['section-content']}>
+              <div className={css['activity-list']}>
+                {userData?.recentTests?.slice(-10).reverse().map((test, index) => (
+                  <div key={index} className={css['activity-item']}>
+                    <div className={css['activity-date']}>
+                      {new Date(test.timestamp).toLocaleDateString()} at{' '}
+                      {new Date(test.timestamp).toLocaleTimeString()}
+                    </div>
+                    <div className={css['activity-stats']}>
+                      {test.wpm} WPM • {test.accuracy}% accuracy
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

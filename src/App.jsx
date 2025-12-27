@@ -1,6 +1,7 @@
 import './App.css'
 
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+// import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import ResultsModal from './components/ResultsModal'
 import ActionButtons from './components/ActionButtons'
 import TextDisplay from './components/TextDisplay'
@@ -105,7 +106,10 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
     initializeText,
     setTextSource,
     countdown,
-    isLoading
+    isLoading,
+    wordWPMs,
+    currentChunkStartWordIndex,
+    getRemainingWordChars
   } = useTypingGame();
 
   useEffect(() => {
@@ -130,12 +134,15 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
         nextChunk={nextChunk}
         typedText={typedText}
         isLoading={isLoading}
+        wordWPMs={wordWPMs}
+        currentChunkStartWordIndex={currentChunkStartWordIndex}
       />
       {showKeyboard && (
         <VirtualKeyboard 
           nextKey={getNextKey()} 
           showFingerLayout={showFingerLayout}
           showHands={showHands}
+          remainingWordChars={getRemainingWordChars()}
         />
       )}
       <ActionButtons

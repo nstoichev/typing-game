@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './VirtualKeyboard.module.css';
 import VirtualHands from './VirtualHands';
 import PropTypes from 'prop-types';
+import { useAuth } from '../contexts/AuthContext';
 
 const fingerColors = {
   leftPinky: '#efb430',    // Pink
@@ -98,14 +99,18 @@ const getFingerForKey = (key) => {
   return fingerMap[key] || null;
 };
 
-const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands }) => {
+const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordChars = '' }) => {
+  const { userData } = useAuth();
+  // Default to 'nextKey' if not set (only highlight current key)
+  const keyboardWordHighlight = userData?.keyboardWordHighlight || 'nextKey';
+  const showWordHighlight = keyboardWordHighlight === 'fullWord';
   // Helper function to determine which Shift key to highlight
   const getShiftSide = (letter) => {
     const leftHandKeys = 'qwertasdfgzxcvb1234567';
     return leftHandKeys.includes(letter.toLowerCase()) ? 'ShiftRight' : 'ShiftLeft';
   };
 
-  // Helper function to check if a key should be highlighted
+  // Helper function to check if a key should be highlighted (full opacity)
   const shouldHighlight = (keyObj, nextKey) => {
     if (!nextKey) return false;
     
@@ -135,6 +140,46 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands }) => {
     // Handle special characters that are displayed differently
     if (keyObj.shiftChar === nextKey) {
       return true;
+    }
+    
+    return false;
+  };
+
+  // Helper function to check if a key should be highlighted with reduced opacity
+  const shouldHighlightReduced = (keyObj, remainingWordChars) => {
+    if (!remainingWordChars || remainingWordChars.length === 0) return false;
+    
+    // Check each remaining character in the word
+    for (let i = 1; i < remainingWordChars.length; i++) { // Start from 1 to skip current key
+      const char = remainingWordChars[i];
+      
+      // Handle space character
+      if (char === ' ' && keyObj.key === 'Space') return true;
+      
+      // Direct match (case insensitive)
+      if (keyObj.key.toLowerCase() === char.toLowerCase()) return true;
+      
+      // Check if shift should be highlighted for capitals or special chars
+      if (keyObj.key === 'ShiftLeft' || keyObj.key === 'ShiftRight') {
+        // For capital letters
+        if (char === char.toUpperCase() && char !== char.toLowerCase()) {
+          return keyObj.key === getShiftSide(char);
+        }
+        // For special characters that need shift
+        if (keyObj.shiftChar && keyObj.shiftChar === char) {
+          return keyObj.key === getShiftSide(char);
+        }
+        // Always highlight shift for shift characters
+        if (char === '"' || char === ':' || char === '<' || char === '>' || 
+            char === '?' || char === '{' || char === '}' || char === '|') {
+          return keyObj.key === getShiftSide(char);
+        }
+      }
+
+      // Handle special characters that are displayed differently
+      if (keyObj.shiftChar === char) {
+        return true;
+      }
     }
     
     return false;
@@ -235,13 +280,17 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands }) => {
             const finger = getFingerForKey(keyObj.key);
             const fingerColor = showFingerLayout && finger ? fingerColors[finger] : undefined;
             
+            const isHighlighted = shouldHighlight(keyObj, nextKey);
+            const isHighlightedReduced = showWordHighlight && !isHighlighted && shouldHighlightReduced(keyObj, remainingWordChars);
+            
             return (
               <div
                 key={keyObj.key}
                 className={`${styles.key} 
                   ${keyObj.wide ? styles.wideKey : ''} 
                   ${keyObj.extraWide ? styles.spaceKey : ''} 
-                  ${shouldHighlight(keyObj, nextKey) ? styles.highlight : ''}`}
+                  ${isHighlighted ? styles.highlight : ''}
+                  ${isHighlightedReduced ? styles.highlightReduced : ''}`}
                 style={fingerColor ? { backgroundColor: fingerColor } : undefined}
               >
                 {primary.includes('\n') ? (
@@ -268,7 +317,8 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands }) => {
 VirtualKeyboard.propTypes = {
   nextKey: PropTypes.string,
   showFingerLayout: PropTypes.bool.isRequired,
-  showHands: PropTypes.bool.isRequired
+  showHands: PropTypes.bool.isRequired,
+  remainingWordChars: PropTypes.string
 };
 
 export default VirtualKeyboard; 

@@ -37,6 +37,8 @@ export const useTypingGame = () => {
   const [isLoading, setIsLoading] = useState(false);
   const timerRef = useRef(null);
   const initialCountdownRef = useRef(null);
+  const [wordWPMs, setWordWPMs] = useState({}); // Map of wordIndex -> WPM
+  const wordStartTimesRef = useRef({}); // Map of wordIndex -> start timestamp
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
@@ -243,6 +245,21 @@ export const useTypingGame = () => {
       const currentPosition = currentChunkStartIndex + typedText.length;
       const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
       
+      // Calculate word index in the full text by counting words before this word's start position
+      const textBeforeWord = text.slice(0, wordInfo.startPos);
+      const wordIndex = textBeforeWord.split(' ').filter(w => w.length > 0).length;
+      
+      // Track word start time (when first character of word is typed)
+      if (wordInfo.word && !wordStartTimesRef.current[wordIndex]) {
+        // Check if this is the first character of the word
+        // The word starts at wordInfo.startPos, and we're typing at currentPosition
+        // If currentPosition equals wordInfo.startPos, we're typing the first character
+        const isFirstCharOfWord = currentPosition === wordInfo.startPos;
+        if (isFirstCharOfWord) {
+          wordStartTimesRef.current[wordIndex] = Date.now();
+        }
+      }
+      
       // Combined check: handle wrong character and wrong word tracking together
       if (isWrong) {
         setWrongChars(prev => prev + 1);
@@ -271,12 +288,31 @@ export const useTypingGame = () => {
             if (typedWordWithoutSpace === wordInfo.word && wrongWords.includes(wordInfo.word)) {
               setWrongWords(prev => prev.filter(word => word !== wordInfo.word));
             }
+            
+            // Calculate and store WPM for this word
+            const wordStartTime = wordStartTimesRef.current[wordIndex];
+            if (wordStartTime && !wordWPMs[wordIndex]) {
+              const wordEndTime = Date.now();
+              const timeInMinutes = (wordEndTime - wordStartTime) / 60000;
+              const wordLength = wordInfo.word.length;
+              // WPM = (characters / 5) / time in minutes
+              const wordWPM = timeInMinutes > 0 ? Math.round((wordLength / 5) / timeInMinutes) : 0;
+              setWordWPMs(prev => ({ ...prev, [wordIndex]: wordWPM }));
+            }
           }
         }
       }
       
       if (newTypedText.length === currentChunk.length) {
         const nextChunkStart = currentChunkStartIndex + currentChunk.length;
+        
+        // Don't move to next chunk if we've reached the end of the text (in freestyle mode)
+        // This prevents clearing the display when the test completes
+        if (nextChunkStart >= text.length && countdown === null) {
+          // We've reached the end, don't advance chunks
+          // The completion will be handled by the useEffect that checks for completion
+          return;
+        }
         
         // Ensure we have enough text for preview
         const updatedText = ensurePreviewText(text, nextChunkStart);
@@ -309,6 +345,8 @@ export const useTypingGame = () => {
     setIsActive(false);
     setStats(null);
     setStartTime(null);
+    setWordWPMs({});
+    wordStartTimesRef.current = {};
     const firstChunk = getChunkWithWordBoundary(text, 0);
     setCurrentChunk(firstChunk.chunk);
     const secondChunk = getChunkWithWordBoundary(text, firstChunk.endIndex);
@@ -412,6 +450,8 @@ export const useTypingGame = () => {
     setIsActive(false);
     setStats(null);
     setStartTime(null);
+    setWordWPMs({});
+    wordStartTimesRef.current = {};
 
     try {
       let newText;
@@ -464,6 +504,26 @@ export const useTypingGame = () => {
     }
   };
 
+  // Calculate starting word index for current chunk
+  const currentChunkStartWordIndex = text.slice(0, currentChunkStartIndex).split(' ').filter(w => w.length > 0).length;
+
+  // Get remaining characters in the current word
+  const getRemainingWordChars = useCallback(() => {
+    if (!text || !currentChunk) return '';
+    
+    const currentPosition = currentChunkStartIndex + typedText.length;
+    const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
+    
+    if (!wordInfo.word) return '';
+    
+    // Calculate how many characters have been typed in this word
+    const wordStartInChunk = wordInfo.startPos - currentChunkStartIndex;
+    const typedInWord = Math.max(0, typedText.length - wordStartInChunk);
+    
+    // Return remaining characters in the word (including the current character)
+    return wordInfo.word.slice(typedInWord);
+  }, [text, currentChunk, typedText, currentChunkStartIndex, getCurrentWord]);
+
   return {
     currentChunk,
     nextChunk,
@@ -479,6 +539,9 @@ export const useTypingGame = () => {
     setIsActive,
     countdown,
     setCountdown,
-    isLoading
+    isLoading,
+    wordWPMs,
+    currentChunkStartWordIndex,
+    getRemainingWordChars
   };
 }; 

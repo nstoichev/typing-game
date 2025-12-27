@@ -15,7 +15,10 @@ const Practice = ({ showKeyboard, showFingerLayout, showHands }) => {
     initializeText,
     countdown,
     setCountdown,
-    setIsActive
+    setIsActive,
+    wordWPMs,
+    currentChunkStartWordIndex,
+    getRemainingWordChars
   } = useTypingGame('random');
 
   // Initialize countdown to 60 seconds
@@ -45,12 +48,15 @@ const Practice = ({ showKeyboard, showFingerLayout, showHands }) => {
         currentChunk={currentChunk}
         nextChunk={nextChunk}
         typedText={typedText}
+        wordWPMs={wordWPMs}
+        currentChunkStartWordIndex={currentChunkStartWordIndex}
       />
       {showKeyboard && (
         <VirtualKeyboard 
           nextKey={getNextKey()} 
           showFingerLayout={showFingerLayout}
           showHands={showHands}
+          remainingWordChars={getRemainingWordChars()}
         />
       )}
       <ActionButtons

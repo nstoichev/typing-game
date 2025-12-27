@@ -12,9 +12,11 @@ const LoadingAnimation = () => (
   </div>
 );
 
-const TextDisplay = ({ currentChunk, nextChunk, typedText, isLoading }) => {
+const TextDisplay = ({ currentChunk, nextChunk, typedText, isLoading, wordWPMs = {}, currentChunkStartWordIndex = 0 }) => {
   const { userData } = useAuth();
   const highlightMode = userData?.highlightMode || 'letters';
+  // Default to true (on) if not set
+  const showWordWPM = userData?.showWordWPM !== false;
 
   const renderText = (text, isPreview = false) => {
     if (!text) return null;
@@ -43,6 +45,9 @@ const TextDisplay = ({ currentChunk, nextChunk, typedText, isLoading }) => {
       const spaceChar = wordIndex < words.length - 1 ? ' ' : '';
       const chars = (word + spaceChar).split('');
       
+      // Calculate the absolute word index in the full text
+      const absoluteWordIndex = currentChunkStartWordIndex + wordIndex;
+      
       // Check if this is the current word (including the space)
       const isCurrentWord = typedText.length >= wordStart && 
                            typedText.length <= wordStart + wordLength;
@@ -59,8 +64,17 @@ const TextDisplay = ({ currentChunk, nextChunk, typedText, isLoading }) => {
       // Only apply success class in words highlight mode
       const showSuccess = highlightMode === 'words' && isCompleteAndCorrect;
       
+      // Get WPM for this word if it exists and setting is enabled
+      const wordWPM = wordWPMs[absoluteWordIndex];
+      const showWPM = showWordWPM && wordWPM !== undefined && isCompleteAndCorrect;
+      
       const wordElement = (
         <span key={wordIndex} className={`${styles.word} ${isCurrentWord ? styles.active : ''} ${hasWrongChars ? styles.wrong : ''} ${showSuccess ? styles.success : ''}`}>
+          {showWPM && (
+            <span className={styles['word-wpm']}>
+              {wordWPM} wpm
+            </span>
+          )}
           {chars.map((char, charIndex) => {
             const absoluteIndex = wordStart + charIndex;
             const isTyped = absoluteIndex < typedText.length;

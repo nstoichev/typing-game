@@ -81,6 +81,23 @@
   margin-top: 1rem;
 }
 
+.word-wpm {
+  position: absolute !important;
+  top: -1.5rem;
+  left: calc(50% - 10px);
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: var(--button-text-color);
+  white-space: nowrap;
+  opacity: 0.8;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 10;
+  background-color: var(--button-bg);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
 .word.active:before {
   content: '';
   position: absolute;
