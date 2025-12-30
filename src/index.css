@@ -41,6 +41,7 @@
   --card-shadow-hover: var(--box-shadow-light-hover);
   --button-text: var(--text-color);
   --button-bg: var(--button-bg-color-light);
+  --input-bg-color: var(--light-color-active);
 
   --button-bg-color: var(--button-bg);
   --button-text-color: var(--light-color-active);
@@ -216,5 +217,6 @@ h1, h2, h3, h4, h5, h6 {
     --card-shadow: var(--box-shadow-dark);
     --card-shadow-hover: var(--box-shadow-dark-wide);
     --button-bg: #444;
+    --input-bg-color: var(--dark-color-active);
   }
 }

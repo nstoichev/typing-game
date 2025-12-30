@@ -11,7 +11,7 @@ import Practice from './pages/Practice'
 import Account from './pages/Account'
 import Teams from './pages/Teams'
 import { useTypingGame } from './hooks/useTypingGame'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TeamsProvider } from './contexts/TeamsContext'
 import Auth from './components/Auth'
@@ -29,9 +29,21 @@ function AppContent() {
   const [showFingerLayout, setShowFingerLayout] = useState(false);
   const [showHands, setShowHands] = useState(false);
   const [textSource, setTextSource] = useState('random');
+  const customTextHandlerRef = useRef(null);
+  const customTextRef = useRef('');
   
   // Initialize theme
   useTheme();
+  
+  const handleCustomTextStart = useCallback((text) => {
+    if (customTextHandlerRef.current) {
+      customTextHandlerRef.current(text);
+      // Update textSource state to 'custom' so the radio button shows as selected
+      setTextSource('custom');
+      // Store the custom text in the ref
+      customTextRef.current = text;
+    }
+  }, [setTextSource]);
   
   return (
     <div className="app">
@@ -45,6 +57,8 @@ function AppContent() {
         currentSource={textSource}
         onSourceChange={setTextSource}
         hideSourceSelector={false}
+        onCustomTextStart={handleCustomTextStart}
+        customTextRef={customTextRef}
       />
       <TeamStatsUpdater />
       <PageWrapper>
@@ -58,6 +72,8 @@ function AppContent() {
                 showHands={showHands}
                 textSource={textSource}
                 onSourceChange={setTextSource}
+                customTextHandlerRef={customTextHandlerRef}
+                customTextRef={customTextRef}
               />
             } 
           />
@@ -94,7 +110,7 @@ function AppContent() {
   );
 }
 
-function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceChange }) {
+function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceChange, customTextHandlerRef, customTextRef }) {
   const {
     currentChunk,
     nextChunk,
@@ -105,6 +121,8 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
     handleTryAgain,
     initializeText,
     setTextSource,
+    setCustomText,
+    customText,
     countdown,
     isLoading,
     wordWPMs,
@@ -115,6 +133,19 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
   useEffect(() => {
     setTextSource(textSource);
   }, [textSource, setTextSource]);
+
+  useEffect(() => {
+    if (customTextHandlerRef) {
+      customTextHandlerRef.current = setCustomText;
+    }
+  }, [setCustomText, customTextHandlerRef]);
+
+  // Update customTextRef when customText changes
+  useEffect(() => {
+    if (customTextRef && customText) {
+      customTextRef.current = customText;
+    }
+  }, [customText, customTextRef]);
 
   const getNextKey = () => {
     if (!currentChunk) return '';
@@ -149,9 +180,15 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
         onRestart={handleRestart}
         onGenerate={initializeText}
         isLoading={isLoading}
+        hideGenerate={textSource === 'custom'}
       />
       {isComplete && stats && (
-        <ResultsModal stats={stats} onTryAgain={handleTryAgain} onGenerate={initializeText} />
+        <ResultsModal 
+          stats={stats} 
+          onTryAgain={handleTryAgain} 
+          onGenerate={initializeText}
+          hideGenerate={textSource === 'custom'}
+        />
       )}
     </div>
   )

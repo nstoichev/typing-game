@@ -14,8 +14,12 @@ const Settings = ({
   showHands,
   onToggleHands,
   hideSourceSelector,
-  showSourceSelector = true
+  showSourceSelector = true,
+  onCustomTextStart,
+  customTextRef
 }) => {
+  // Provide a default no-op function if onCustomTextStart is not provided
+  const handleCustomTextStart = onCustomTextStart || (() => {});
   const [isOpen, setIsOpen] = useState(false);
   const settingsRef = useRef(null);
 
@@ -49,6 +53,8 @@ const Settings = ({
                 onSourceChange={onSourceChange}
                 currentSource={currentSource}
                 hide={hideSourceSelector}
+                onCustomTextStart={handleCustomTextStart}
+                customTextRef={customTextRef}
               />
             </div>
           )}
@@ -109,7 +115,8 @@ Settings.propTypes = {
   showHands: PropTypes.bool.isRequired,
   onToggleHands: PropTypes.func.isRequired,
   hideSourceSelector: PropTypes.bool,
-  showSourceSelector: PropTypes.bool
+  showSourceSelector: PropTypes.bool,
+  onCustomTextStart: PropTypes.func
 };
 
 export default Settings;

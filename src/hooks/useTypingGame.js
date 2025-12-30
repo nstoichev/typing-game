@@ -5,6 +5,7 @@ import words from '../jsons/words.json';
 const CHUNK_SIZE = 100;
 const CHUNK_BUFFER = 20;
 const MAX_WIKI_ATTEMPTS = 5;
+const MAX_CUSTOM_TEXT_LENGTH = 10000;
 
 // List of valid typing keys
 const VALID_TYPING_KEYS = new Set([
@@ -35,6 +36,7 @@ export const useTypingGame = () => {
   const [textSource, setTextSource] = useState('random');
   const [countdown, setCountdown] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [customText, setCustomText] = useState('');
   const timerRef = useRef(null);
   const initialCountdownRef = useRef(null);
   const [wordWPMs, setWordWPMs] = useState({}); // Map of wordIndex -> WPM
@@ -42,6 +44,37 @@ export const useTypingGame = () => {
 
   const isValidText = (text) => {
     return /^[a-zA-Z0-9\s.,!?'"-]+$/.test(text);
+  };
+
+  // Validate custom text - filter invalid characters and check length
+  const validateCustomText = (text) => {
+    if (!text || typeof text !== 'string') {
+      return { valid: false, error: 'Invalid text provided' };
+    }
+
+    const trimmedText = text.trim();
+    if (!trimmedText) {
+      return { valid: false, error: 'Text cannot be empty' };
+    }
+
+    // Check length
+    if (trimmedText.length > MAX_CUSTOM_TEXT_LENGTH) {
+      return { valid: false, error: `Text exceeds maximum length of ${MAX_CUSTOM_TEXT_LENGTH} characters` };
+    }
+
+    // Filter invalid characters (same pattern as CustomTextModal)
+    // Characters: a-z, A-Z, 0-9, space, and: , . ; ' " ! ? - _ = + [ ] { } \ | ` ~ @ # $ % ^ & * ( ) / < >
+    const VALID_CHARS_REGEX = /^[a-zA-Z0-9\s.,;'"!?\-_=+\[\]{}|\\`~@#$%^&*()\/<>]$/;
+    const filteredText = trimmedText.split('').filter(char => {
+      if (char === '\n') return true;
+      return VALID_CHARS_REGEX.test(char);
+    }).join('');
+
+    if (filteredText !== trimmedText) {
+      return { valid: false, error: 'Text contains invalid characters (emojis, special symbols). Only keyboard-typable characters are allowed.' };
+    }
+
+    return { valid: true, text: filteredText };
   };
 
   const fetchWikipediaText = async (attempt = 1) => {
@@ -109,10 +142,18 @@ export const useTypingGame = () => {
       };
     }
     
-    let lastSpaceIndex = text.lastIndexOf(' ', endIndex);
+    // Find the last space or newline before endIndex
+    const lastSpaceIndex = Math.max(
+      text.lastIndexOf(' ', endIndex),
+      text.lastIndexOf('\n', endIndex)
+    );
     
     if (lastSpaceIndex <= startIndex) {
-      lastSpaceIndex = endIndex;
+      // If no space/newline found, use endIndex
+      return {
+        chunk: text.slice(startIndex, endIndex),
+        endIndex: endIndex
+      };
     }
     
     const chunk = text.slice(startIndex, lastSpaceIndex + 1);
@@ -144,17 +185,40 @@ export const useTypingGame = () => {
     return currentText;
   };
 
-  // Helper function to get current word boundaries
+  // Helper function to get current word boundaries (handles spaces and newlines)
   const getCurrentWord = useCallback((text, position, chunkStartIndex, chunkLength) => {
-    const lastSpaceIndex = text.lastIndexOf(' ', position);
-    const nextSpaceIndex = text.indexOf(' ', position);
+    // Find the last space or newline before position
+    const lastSpaceIndex = Math.max(
+      text.lastIndexOf(' ', position),
+      text.lastIndexOf('\n', position)
+    );
+    // Find the next space or newline after position
+    const nextSpaceIndex = (() => {
+      const nextSpace = text.indexOf(' ', position);
+      const nextNewline = text.indexOf('\n', position);
+      if (nextSpace === -1) return nextNewline;
+      if (nextNewline === -1) return nextSpace;
+      return Math.min(nextSpace, nextNewline);
+    })();
+    
+    const startPos = lastSpaceIndex === -1 ? chunkStartIndex : lastSpaceIndex + 1;
+    const endPos = nextSpaceIndex === -1 ? chunkStartIndex + chunkLength : nextSpaceIndex;
+    const word = text.slice(startPos, endPos);
+    
+    // If the word contains a newline, return just the newline
+    if (word.includes('\n')) {
+      const newlinePos = text.indexOf('\n', startPos);
+      return {
+        word: '\n',
+        startPos: newlinePos,
+        endPos: newlinePos + 1
+      };
+    }
+    
     return {
-      word: text.slice(
-        lastSpaceIndex === -1 ? chunkStartIndex : lastSpaceIndex + 1,
-        nextSpaceIndex === -1 ? chunkStartIndex + chunkLength : nextSpaceIndex
-      ).trim(),
-      startPos: lastSpaceIndex === -1 ? chunkStartIndex : lastSpaceIndex + 1,
-      endPos: nextSpaceIndex === -1 ? chunkStartIndex + chunkLength : nextSpaceIndex
+      word: word.trim(),
+      startPos: startPos,
+      endPos: endPos
     };
   }, []);
 
@@ -169,9 +233,22 @@ export const useTypingGame = () => {
       return;
     }
 
+    // Don't process keys if user is typing in an input, textarea, or if a modal is open
+    const target = e.target;
+    const isInputElement = target && (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable ||
+      target.closest('.modal-overlay') !== null
+    );
+    
+    if (isInputElement) {
+      return;
+    }
+
     // Check if the key is a valid typing key
     const key = e.key || '';
-    const isValidTypingKey = VALID_TYPING_KEYS.has(key.toLowerCase()) || key === 'Backspace';
+    const isValidTypingKey = VALID_TYPING_KEYS.has(key.toLowerCase()) || key === 'Backspace' || key === 'Enter';
 
     if (!isActive && isValidTypingKey) {
       setIsActive(true);
@@ -220,8 +297,10 @@ export const useTypingGame = () => {
         const currentPosition = currentChunkStartIndex + newTypedText.length;
         const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
         if (wordInfo.word) {
-          // Get the typed portion of the current word
-          const typedWordStart = Math.max(0, newTypedText.lastIndexOf(' ') + 1);
+          // Get the typed portion of the current word (from last space or newline)
+          const lastSpace = newTypedText.lastIndexOf(' ');
+          const lastNewline = newTypedText.lastIndexOf('\n');
+          const typedWordStart = Math.max(0, Math.max(lastSpace, lastNewline) + 1);
           const typedWord = newTypedText.slice(typedWordStart);
           
           // Check if word is complete (at end of word or followed by space in original text)
@@ -236,18 +315,67 @@ export const useTypingGame = () => {
       return;
     }
 
-    if (e.key.length === 1) {
-      const newTypedText = typedText + e.key;
+    // Handle Enter key for newlines
+    if (e.key === 'Enter') {
+      const currentPosition = currentChunkStartIndex + typedText.length;
+      const currentChar = text[currentPosition];
+      const isNewline = currentChar === '\n';
+      const isWrong = !isNewline;
+      
+      if (isWrong) {
+        setWrongChars(prev => prev + 1);
+        // Add newline to wrongWords if not already there
+        if (!wrongWords.includes('\n')) {
+          setWrongWords(prev => [...prev, '\n']);
+        }
+      } else {
+        // Correct newline - remove from wrongWords if it was there
+        if (wrongWords.includes('\n')) {
+          setWrongWords(prev => prev.filter(word => word !== '\n'));
+        }
+      }
+      
+      const newTypedText = typedText + '\n';
       setTypedText(newTypedText);
       
-      const currentChar = text[currentChunkStartIndex + typedText.length];
-      const isWrong = e.key !== currentChar;
+      // Move to next chunk if needed
+      if (newTypedText.length === currentChunk.length) {
+        const nextChunkStart = currentChunkStartIndex + currentChunk.length;
+        
+        if (nextChunkStart >= text.length && countdown === null) {
+          return;
+        }
+        
+        const updatedText = ensurePreviewText(text, nextChunkStart);
+        if (updatedText !== text) {
+          setText(updatedText);
+        }
+
+        const nextChunk = getChunkWithWordBoundary(updatedText, nextChunkStart);
+        const nextNextChunk = getChunkWithWordBoundary(updatedText, nextChunk.endIndex);
+        
+        setCurrentChunk(nextChunk.chunk);
+        setNextChunk(nextNextChunk.chunk);
+        setCurrentChunkStartIndex(nextChunkStart);
+        setTypedText('');
+      }
+      return;
+    }
+
+    if (e.key.length === 1) {
+      // Check the character BEFORE adding it to typedText to get the correct position
       const currentPosition = currentChunkStartIndex + typedText.length;
+      const currentChar = text[currentPosition];
+      const isWrong = e.key !== currentChar;
+      
+      const newTypedText = typedText + e.key;
+      setTypedText(newTypedText);
       const wordInfo = getCurrentWord(text, currentPosition, currentChunkStartIndex, currentChunk.length);
       
       // Calculate word index in the full text by counting words before this word's start position
+      // Split by both spaces and newlines, then filter empty strings
       const textBeforeWord = text.slice(0, wordInfo.startPos);
-      const wordIndex = textBeforeWord.split(' ').filter(w => w.length > 0).length;
+      const wordIndex = textBeforeWord.split(/[\s\n]+/).filter(w => w.length > 0).length;
       
       // Track word start time (when first character of word is typed)
       if (wordInfo.word && !wordStartTimesRef.current[wordIndex]) {
@@ -265,8 +393,23 @@ export const useTypingGame = () => {
         setWrongChars(prev => prev + 1);
         
         // Add word to wrongWords if not already there
-        if (wordInfo.word && !wrongWords.includes(wordInfo.word)) {
-          setWrongWords(prev => [...prev, wordInfo.word]);
+        // Special handling: if the expected character is a newline, add '\n' to wrongWords
+        if (currentChar === '\n' || wordInfo.word === '\n') {
+          // We're at a newline position and typed wrong - add '\n' to wrongWords
+          setWrongWords(prev => {
+            if (!prev.includes('\n')) {
+              return [...prev, '\n'];
+            }
+            return prev;
+          });
+        } else if (wordInfo.word && wordInfo.word.trim()) {
+          // Add regular word to wrongWords
+          setWrongWords(prev => {
+            if (!prev.includes(wordInfo.word)) {
+              return [...prev, wordInfo.word];
+            }
+            return prev;
+          });
         }
       } else {
         // Character is correct - check if word is complete and correct
@@ -276,17 +419,20 @@ export const useTypingGame = () => {
           const typedWord = newTypedText.slice(typedWordStart);
           
           // Check if word is complete:
-          // 1. If we just typed a space (word is complete)
+          // 1. If we just typed a space or newline (word is complete)
           // 2. If we've reached the end of the expected word
-          const isWordComplete = e.key === ' ' || 
+          const isWordComplete = e.key === ' ' || e.key === '\n' || 
             (currentPosition + 1 >= wordInfo.endPos);
           
           if (isWordComplete) {
             // Remove trailing space if present for comparison
             const typedWordWithoutSpace = typedWord.trim();
             // If word is complete and matches expected word, remove from wrongWords
-            if (typedWordWithoutSpace === wordInfo.word && wrongWords.includes(wordInfo.word)) {
-              setWrongWords(prev => prev.filter(word => word !== wordInfo.word));
+            // Handle newlines specially - they should match '\n'
+            const wordToCheck = wordInfo.word === '\n' ? '\n' : typedWordWithoutSpace;
+            const expectedWord = wordInfo.word === '\n' ? '\n' : wordInfo.word;
+            if (wordToCheck === expectedWord && wrongWords.includes(expectedWord)) {
+              setWrongWords(prev => prev.filter(word => word !== expectedWord));
             }
             
             // Calculate and store WPM for this word
@@ -362,7 +508,58 @@ export const useTypingGame = () => {
     setTextSource(newSource);
   };
 
+  const handleSetCustomText = (text) => {
+    // Validate custom text
+    const validation = validateCustomText(text);
+    if (!validation.valid) {
+      console.error('Custom text validation failed:', validation.error);
+      // Still set the text source to custom, but don't initialize with invalid text
+      setTextSource('custom');
+      return;
+    }
+
+    const validatedText = validation.text;
+    setCustomText(validatedText);
+    setTextSource('custom');
+    // Initialize text with custom text immediately
+    setIsLoading(true);
+    // Clear any existing timer
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    initialCountdownRef.current = null;
+
+    // Clear existing text
+    setText('');
+    setCurrentChunk('');
+    setNextChunk('');
+    setTypedText('');
+    setWrongWords([]);
+    setWrongChars(0);
+    setIsComplete(false);
+    setIsActive(false);
+    setStats(null);
+    setStartTime(null);
+    setWordWPMs({});
+    wordStartTimesRef.current = {};
+
+    // Set the custom text
+    setText(validatedText);
+    const firstChunk = getChunkWithWordBoundary(validatedText, 0);
+    setCurrentChunk(firstChunk.chunk);
+    const secondChunk = getChunkWithWordBoundary(validatedText, firstChunk.endIndex);
+    setNextChunk(secondChunk.chunk);
+    setCurrentChunkStartIndex(0);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
+    // Don't initialize text if source is 'custom' but no custom text has been set yet
+    // Wait for user to enter text via the modal
+    if (textSource === 'custom' && !customText) {
+      return;
+    }
     initializeText();
   }, [textSource]);
 
@@ -457,6 +654,16 @@ export const useTypingGame = () => {
       let newText;
       if (textSource === 'wikipedia') {
         newText = await fetchWikipediaText();
+      } else if (textSource === 'custom') {
+        // If custom source is selected but no custom text, don't generate anything
+        // This should not happen due to the useEffect check, but handle it gracefully
+        if (customText) {
+          newText = customText;
+        } else {
+          // Clear text and return early - user needs to enter text via modal
+          setIsLoading(false);
+          return;
+        }
       } else {
         newText = generateRandomText();
       }
@@ -505,7 +712,8 @@ export const useTypingGame = () => {
   };
 
   // Calculate starting word index for current chunk
-  const currentChunkStartWordIndex = text.slice(0, currentChunkStartIndex).split(' ').filter(w => w.length > 0).length;
+  // Split by both spaces and newlines, then filter empty strings
+  const currentChunkStartWordIndex = text.slice(0, currentChunkStartIndex).split(/[\s\n]+/).filter(w => w.length > 0).length;
 
   // Get remaining characters in the current word
   const getRemainingWordChars = useCallback(() => {
@@ -531,10 +739,12 @@ export const useTypingGame = () => {
     isComplete,
     stats,
     textSource,
+    customText,
     handleRestart,
     handleTryAgain,
     initializeText,
     setTextSource: handleSetTextSource,
+    setCustomText: handleSetCustomText,
     isActive,
     setIsActive,
     countdown,

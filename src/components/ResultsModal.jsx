@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import './ResultsModal.css';
 
-const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false }) => {
+const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false, hideGenerate = false }) => {
   const { saveTestResults } = useAuth();
   const { currentTeam } = useTeams();
   const location = useLocation();
@@ -49,7 +49,9 @@ const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false })
             {!hasMoreWords && (
               <div className="wrong-words-list">
                 {wrongWords.map((word, index) => (
-                  <span key={index} className="wrong-word">{word}</span>
+                  <span key={index} className="wrong-word">
+                    {word === '\n' ? '↵ (Enter)' : word}
+                  </span>
                 ))}
               </div>
             )}
@@ -66,9 +68,11 @@ const ResultsModal = ({ stats, onTryAgain, onGenerate, isPracticeMode = false })
               Restart
             </button>
           )}
-          <button className="action-button" onClick={onGenerate}>
-            {isPracticeMode ? 'Reset' : 'Generate New Text'}
-          </button>
+          {!hideGenerate && (
+            <button className="action-button" onClick={onGenerate}>
+              {isPracticeMode ? 'Reset' : 'Generate New Text'}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -83,7 +87,8 @@ ResultsModal.propTypes = {
   }).isRequired,
   onTryAgain: PropTypes.func.isRequired,
   onGenerate: PropTypes.func.isRequired,
-  isPracticeMode: PropTypes.bool
+  isPracticeMode: PropTypes.bool,
+  hideGenerate: PropTypes.bool
 };
 
 export default ResultsModal; 

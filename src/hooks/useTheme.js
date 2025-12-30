@@ -19,6 +19,7 @@ export const useTheme = () => {
       root.style.setProperty('--card-shadow', 'var(--box-shadow-dark)');
       root.style.setProperty('--card-shadow-hover', 'var(--box-shadow-dark-wide)');
       root.style.setProperty('--button-bg', '#444');
+      root.style.setProperty('--input-bg-color', 'var(--dark-color-active)');
     } else {
       root.style.setProperty('--text-color', 'var(--dark-color)');
       root.style.setProperty('--background-color', 'var(--light-color)');
@@ -26,6 +27,7 @@ export const useTheme = () => {
       root.style.setProperty('--card-shadow', 'var(--box-shadow-light)');
       root.style.setProperty('--card-shadow-hover', 'var(--box-shadow-light-hover)');
       root.style.setProperty('--button-bg', 'var(--button-bg-color-light)');
+      root.style.setProperty('--input-bg-color', 'var(--light-color-active)');
     }
   };
 

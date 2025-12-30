@@ -14,7 +14,9 @@ const Navigation = ({
   onToggleFingerLayout,
   showHands,
   onToggleHands,
-  hideSourceSelector
+  hideSourceSelector,
+  onCustomTextStart,
+  customTextRef
 }) => {
   const { currentUser, logout } = useAuth();
   const { currentTeam, setCurrentTeam } = useTeams();
@@ -110,6 +112,8 @@ const Navigation = ({
             onToggleHands={onToggleHands}
             hideSourceSelector={hideSourceSelector}
             showSourceSelector={!isPracticePage}
+            onCustomTextStart={onCustomTextStart || (() => {})}
+            customTextRef={customTextRef}
           />
         )}
       </div>
