@@ -73,33 +73,23 @@
 }
 
 .highlight {
-  background-color: #333 !important;
-  transform: translateY(-2px) translateX(-2px);
-  box-shadow: 0 0 8px rgba(74, 158, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  border-color: #fff;
-  color: #fff;
+  transform: translateY(-2px) translateX(-2px) scale(1.05);
+  box-shadow: 0px 0px 10px var(--accent-color), inset 0 0px 10px var(--accent-color);
+  border-color: var(--accent-color);
+  background-color: var(--accent-color);
+  color: var(--light-color-active);
   font-size: 18px;
-  text-shadow: 4px 4px 1px #000;
+  text-shadow: 4px 4px 1px var(--text-color-reduced);
   overflow: hidden;
-}
-
-.highlight::after {
-  background: rgba(0, 0, 0, 1);
 }
 
 .highlightReduced {
-  background-color: rgba(51, 51, 51, 0.5) !important;
   transform: translateY(-1px) translateX(-1px);
-  box-shadow: 0 0 4px rgba(74, 158, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 0 2px var(--accent-color), inset 0 0 2px var(--accent-color);
+  border-color: var(--accent-color);
   font-size: 16px;
-  text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.5);
+  text-shadow: 2px 2px 1px var(--text-color-reduced);
   overflow: hidden;
-}
-
-.highlightReduced::after {
-  background: rgba(0, 0, 0, 0.5);
 }
 
 .dualChar {
@@ -123,4 +113,15 @@
 .singleChar {
   font-size: 14px;
   text-align: center;
-} 
+}
+
+.homeRowKey:before {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 2px;
+  background-color: var(--text-color);
+}

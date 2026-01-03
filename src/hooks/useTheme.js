@@ -14,6 +14,7 @@ export const useTheme = () => {
     const root = document.documentElement;
     if (theme === 'dark') {
       root.style.setProperty('--text-color', 'var(--light-color)');
+      root.style.setProperty('--text-color-reduced', 'var(--light-color-reduced)');
       root.style.setProperty('--background-color', 'var(--dark-color)');
       root.style.setProperty('--card-bg-color', 'var(--dark-color-active)');
       root.style.setProperty('--card-shadow', 'var(--box-shadow-dark)');
@@ -22,6 +23,7 @@ export const useTheme = () => {
       root.style.setProperty('--input-bg-color', 'var(--dark-color-active)');
     } else {
       root.style.setProperty('--text-color', 'var(--dark-color)');
+      root.style.setProperty('--text-color-reduced', 'var(--dark-color-reduced)');
       root.style.setProperty('--background-color', 'var(--light-color)');
       root.style.setProperty('--card-bg-color', 'var(--light-color-active)');
       root.style.setProperty('--card-shadow', 'var(--box-shadow-light)');

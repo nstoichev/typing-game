@@ -88,7 +88,6 @@ const Settings = ({
                 <label className={`${styles.settingLabel} ${styles.indented}`}>
                   <input
                     type="checkbox"
-                    disabled
                     checked={showHands}
                     onChange={(e) => onToggleHands(e.target.checked)}
                     className={styles.customCheckbox}

@@ -3,6 +3,7 @@ import ResultsModal from '../components/ResultsModal';
 import ActionButtons from '../components/ActionButtons';
 import TextDisplay from '../components/TextDisplay';
 import VirtualKeyboard from '../components/VirtualKeyboard';
+import VirtualHands from '../components/VirtualHands';
 import { useTypingGame } from '../hooks/useTypingGame';
 
 const Practice = ({ showKeyboard, showFingerLayout, showHands }) => {
@@ -57,6 +58,12 @@ const Practice = ({ showKeyboard, showFingerLayout, showHands }) => {
           showFingerLayout={showFingerLayout}
           showHands={showHands}
           remainingWordChars={getRemainingWordChars()}
+        />
+      )}
+      {showKeyboard && showHands && (
+        <VirtualHands 
+          nextKey={getNextKey()} 
+          showHands={showHands}
         />
       )}
       <ActionButtons

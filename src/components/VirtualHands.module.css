@@ -1,122 +1,651 @@
 .handsContainer {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-  display: none !important;
+  position: relative;
 }
 
 .leftHand,
 .rightHand {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   position: absolute;
-  z-index: 8;
+  bottom: -110px;
+}
+
+.rightHand {
+  right: 100px;
+  transform: rotate(-20deg);
+}
+
+.leftHand {
+  left: 50px;
+  transform: rotate(20deg) scaleX(-1);
 }
 
 .palm {
-  width: 150px;
-  height: 150px;
-  background-color: #f5f5f5;
-  border-radius: 40px 40px 60px 60px;
+  position: relative;
+  width: 220px;
+  height: 200px;
+  border-radius: 66px 66px 66px 66px;
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    inset 0 3px 6px rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--text-color-reduced);
+  border-top: none !important;
+  border-left: none !important;
 }
 
-.finger {
+/* Finger base - positioned relative to palm */
+.fingerBase {
   position: absolute;
-  background-color: #f5f5f5;
-  border-radius: 10px;
-  transition: transform 0.2s ease;
+  border-radius: 26px 26px 18px 18px;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 3px 6px rgba(0, 0, 0, 0.2),
+    inset 0 1.5px 3px rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--text-color-reduced);
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
-.finger.active {
-  background-color: #4CAF50;
+/* Finger joint - positioned relative to finger base */
+.fingerJoint {
+  position: absolute;
+  border-radius: 15px;
+  transition: all 0.1s ease;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--text-color-reduced);
+  border-bottom: none !important;
+  border-top: none !important;
 }
 
+/* Finger tip - positioned relative to finger joint */
+.fingerTip {
+  position: absolute;
+  border-radius: 35px 35px 12px 12px;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--text-color-reduced);
+  border-bottom: none !important;
+}
+
+/* Active state for finger parts */
+.fingerBase.active,
+.fingerBase.active .fingerJoint,
+.fingerBase.active .fingerTip {
+  box-shadow: 
+    0 0 12px var(--accent-color),
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  border-color: var(--accent-color);
+}
+
+/* Thumb - finger base positioned relative to palm */
 .thumb {
-  width: 40px;
-  height: 60px;
-  bottom: 0;
+  width: 67px;
+  height: 80px;
+  bottom: 15px;
+  left: -10px;
+  transform-origin: bottom center;
+  border-radius: 20px 20px 18px 50px;
+  border-right: none !important;
+  box-shadow:-4px 3px 6px rgba(0, 0, 0, 0.2), inset 0 1.5px 3px rgba(255, 255, 255, 0.3);
+}
+
+.thumb .fingerJoint {
+  width: 57px;
+  height: 80px;
+  bottom: 100%;
   left: 50%;
-  transform: translateX(-50%) rotate(-45deg);
+  transform: translateX(-40%) rotate(10deg);
+}
+
+.thumb .fingerTip {
+  width: 50px;
+  height: 60px;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-40%) rotate(10deg);
+  border-radius: 15px 50px 15px 15px;
+}
+
+/* Index finger - finger base positioned relative to palm */
+.index {
+  width: 58px;
+  height: 73px;
+  bottom: 93%;
+  left: calc(80% - 170px);
+  transform-origin: bottom center;
+  z-index: 2;
+}
+
+.index .fingerJoint {
+  width: 56px;
+  height: 59px;
+  bottom: 65%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.index .fingerTip {
+  width: 51px;
+  height: 44px;
+  bottom: 65%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Middle finger - finger base positioned relative to palm */
+.middle {
+  width: 58px;
+  height: 76px;
+  bottom: 100%;
+  left: calc(80% - 110px);
+  transform: translateX(-50%);
   transform-origin: bottom center;
 }
 
-.index {
-  width: 30px;
-  height: 80px;
-  bottom: 100%;
-  right: 0;
-}
-
-.middle {
-  width: 30px;
-  height: 90px;
-  top: 25%;
+.middle .fingerJoint {
+  width: 53px;
+  height: 63px;
+  bottom: 30%;
   left: 50%;
   transform: translateX(-50%);
 }
 
+.middle .fingerTip {
+  width: 49px;
+  height: 59px;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Ring finger - finger base positioned relative to palm */
 .ring {
-  width: 30px;
-  height: 85px;
-  top: 27%;
+  width: 57px;
+  height: 70px;
+  bottom: 95%;
+  left: calc(80% - 55px);
+  transform-origin: bottom center;
+}
+
+.ring .fingerJoint {
+  width: 51px;
+  height: 63px;
+  bottom: 20%;
   left: 50%;
   transform: translateX(-50%);
 }
 
+.ring .fingerTip {
+  width: 47px;
+  height: 59px;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Pinky finger - finger base positioned relative to palm */
 .pinky {
-  width: 25px;
-  height: 75px;
-  top: 30%;
+  width: 48px;
+  height: 66px;
+  bottom: 90%;
+  left: 78%;
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+}
+
+.pinky .fingerJoint {
+  width: 44px;
+  height: 51px;
+  bottom: 40%;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* Left hand specific styles */
-.leftHand {
-
-}
-
-.leftHand .thumb {
-  transform: translateX(-50%) rotate(-45deg);
-}
-
-.leftHand .index {
-  transform: translateX(-50%) rotate(-5deg);
-}
-
-.leftHand .middle {
-  transform: translateX(-50%) rotate(-2deg);
-}
-
-.leftHand .ring {
-  transform: translateX(-50%) rotate(2deg);
-}
-
-.leftHand .pinky {
-  transform: translateX(-50%) rotate(5deg);
+.pinky .fingerTip {
+  width: 41px;
+  height: 37px;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* Right hand specific styles */
-.rightHand {
-  /* transform: scale(0.8) scaleX(-1); */
-}
-
 .rightHand .thumb {
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.rightHand .index {
-  transform: translateX(-50%) rotate(5deg);
+  transform: rotate(-25deg);
 }
 
 .rightHand .middle {
-  transform: translateX(-50%) rotate(2deg);
+  transform: rotate(-8deg);
 }
 
 .rightHand .ring {
-  transform: translateX(-50%) rotate(-2deg);
+  transform: rotate(-10deg);
 }
 
 .rightHand .pinky {
-  transform: translateX(-50%) rotate(-5deg);
-} 
+  transform: rotate(-15deg);
+}
+
+/* Left hand specific styles */
+
+.leftHand .thumb {
+  transform: rotate(-25deg);
+}
+
+.leftHand .middle {
+  transform: rotate(-8deg);
+}
+
+.leftHand .ring {
+  transform: rotate(-8deg);
+}
+
+.leftHand .pinky {
+  transform: rotate(-15deg);
+}
+
+/* Position classes - Add styles here for each keyboard position */
+.position-enter .rightHand { transform: rotate(-8deg); }
+.position-enter .active { transform: rotate(30deg); bottom: 90%;}
+.position-enter .active .fingerJoint { bottom: 50%; }
+.position-enter .active .fingerTip { bottom: 50%; }
+
+.position-enter .rightHand .index { transform: rotate(-20deg); }
+.position-enter .rightHand .index .fingerJoint { bottom: 50%; }
+
+.position-enter .rightHand .thumb { transform: rotate(-34deg); }
+
+/* Lowercase letters */
+.position-b .active { transform: rotate(-39deg); left: calc(80% - 180px);}
+.position-b .active .fingerJoint { bottom: 70%; }
+.position-b .active .fingerTip { bottom: 70%; }
+
+/* C key */
+.position-c-rightshift .leftHand,
+.position-c-leftshift .leftHand,
+.position-c .leftHand { transform: rotate(25deg) scaleX(-1); }
+
+.position-c-rightshift .leftHand .active,
+.position-c-leftshift .leftHand .active,
+.position-c .leftHand .active { left: calc(80% - 110px); transform: rotate(-30deg);}
+
+.position-c-rightshift .leftHand .active .fingerJoint,
+.position-c-leftshift .leftHand .active .fingerJoint,
+.position-c .leftHand .active .fingerJoint { bottom: 0%; }
+
+.position-c-rightshift .leftHand .active .fingerTip,
+.position-c-leftshift .leftHand .active .fingerTip,
+.position-c .leftHand .active .fingerTip { bottom: 0%; }
+
+/* E key */
+.position-e-rightshift .leftHand .active,
+.position-e .leftHand .active { transform: rotate(10deg); }
+
+.position-e-rightshift .leftHand .active .fingerJoint,
+.position-e .leftHand .active .fingerJoint { bottom: 80%; }
+
+.position-e-rightshift .leftHand .active .fingerTip,
+.position-e .leftHand .active .fingerTip { bottom: 50%; }
+
+/* G key */
+.position-g-rightshift .leftHand .active,
+.position-g .leftHand .active { transform: rotate(-15deg); }
+
+.position-g-rightshift .leftHand .active .fingerJoint,
+.position-g .leftHand .active .fingerJoint { bottom: 70%; }
+
+.position-g-rightshift .leftHand .active .fingerTip,
+.position-g .leftHand .active .fingerTip { bottom: 90%; }
+
+
+.position-h .active { transform: rotate(-18deg); }
+.position-h .active .fingerJoint { bottom: 70%; }
+.position-h .active .fingerTip { bottom: 90%; }
+
+.position-i .active .fingerJoint { bottom: 70%; }
+.position-i .active .fingerTip { bottom: 90%; }
+
+.position-m .active .fingerJoint { bottom: 30%; }
+.position-m .active .fingerTip { bottom: 0%; }
+
+.position-n .active { transform: rotate(-25deg); }
+.position-n .active .fingerJoint { bottom: 40%; }
+.position-n .active .fingerTip { bottom: 50%; }
+
+.position-o .active .fingerJoint { bottom: 80%; }
+.position-o .active .fingerTip { bottom: 50%; }
+
+.position-p .active .fingerJoint { bottom: 90%; }
+.position-p .active .fingerTip { bottom: 90%; }
+
+/* Q key */
+.position-q-rightshift .leftHand .active,
+.position-q .active { transform: rotate(12deg); }
+
+.position-q-rightshift .leftHand .active .fingerJoint,
+.position-q .active .fingerJoint { bottom: 80%; }
+
+.position-q-rightshift .leftHand .active .fingerTip,
+.position-q .active .fingerTip { bottom: 80%; }
+
+/* R key */
+.position-r-rightshift .leftHand .active,
+.position-r .active { transform: rotate(15deg); }
+
+.position-r-rightshift .leftHand .active .fingerJoint,
+.position-r .active .fingerJoint { bottom: 100%; }
+
+.position-r-rightshift .leftHand .active .fingerTip,
+.position-r .active .fingerTip { bottom: 100%; }
+
+/* T key */
+.position-t-rightshift .leftHand .active,
+.position-t .active .fingerJoint { bottom: 100%; }
+
+
+.position-t-rightshift .leftHand .active .fingerTip,
+.position-t .active .fingerTip { bottom: 100%; }
+
+/* U key */
+.position-u .active { transform: rotate(-1deg); }
+.position-u .active .fingerJoint { bottom: 100%; }
+.position-u .active .fingerTip { bottom: 110%; }
+
+/* V key */
+.position-v-rightshift .leftHand .active,
+.position-v .active { transform: rotate(-22deg); }
+
+.position-v-rightshift .leftHand .active .fingerJoint,
+.position-v .active .fingerJoint { bottom: 40%; }
+
+.position-v-rightshift .leftHand .active .fingerTip,
+.position-v .active .fingerTip { bottom: 40%; }
+
+/* W key */
+.position-w-rightshift .leftHand .active,
+.position-w .active { transform: rotate(8deg); }
+
+.position-w-rightshift .leftHand .active .fingerJoint,
+.position-w .active .fingerJoint { bottom: 50%; }
+
+.position-w-rightshift .leftHand .active .fingerTip,
+.position-w .active .fingerTip { bottom: 50%; }
+
+/* X key */
+.position-x-rightshift .leftHand,
+.position-x .leftHand { transform: rotate(22deg) scaleX(-1); bottom: -115px; }
+
+.position-x-rightshift .leftHand .active,
+.position-x .active { transform: rotate(-37deg); bottom: 90%;}
+
+.position-x-rightshift .leftHand .active .fingerJoint,
+.position-x .active .fingerJoint { bottom: 15%; }
+
+.position-x-rightshift .leftHand .active .fingerTip,
+.position-x .active .fingerTip { bottom: 15%; }
+
+.position-y .active { transform: rotate(-15deg); bottom: 100%;}
+.position-y .active .fingerJoint { bottom: 110%; }
+.position-y .active .fingerTip { bottom: 110%; }
+
+/* Z key */
+.position-z-rightshift .leftHand,
+.position-z .leftHand { transform: rotate(24deg) scaleX(-1); bottom: -115px; }
+
+.position-z-rightshift .leftHand .active,
+.position-z .active { transform: rotate(-47deg); }
+
+.position-z-rightshift .leftHand .active .fingerJoint,
+.position-z .active .fingerJoint { bottom: 10%; }
+
+.position-z-rightshift .leftHand .active .fingerTip,
+.position-z .active .fingerTip { bottom: 10%; }
+
+/* Uppercase letters with left shift */
+.position-a-leftshift { /* Add styles here */ }
+.position-b-leftshift { /* Add styles here */ }
+.position-d-leftshift { /* Add styles here */ }
+.position-e-leftshift { /* Add styles here */ }
+.position-f-leftshift { /* Add styles here */ }
+.position-g-leftshift { /* Add styles here */ }
+.position-h-leftshift { /* Add styles here */ }
+.position-i-leftshift { /* Add styles here */ }
+.position-j-leftshift { /* Add styles here */ }
+.position-k-leftshift { /* Add styles here */ }
+.position-l-leftshift { /* Add styles here */ }
+.position-m-leftshift { /* Add styles here */ }
+.position-n-leftshift { /* Add styles here */ }
+.position-o-leftshift { /* Add styles here */ }
+.position-p-leftshift { /* Add styles here */ }
+.position-q-leftshift { /* Add styles here */ }
+.position-r-leftshift { /* Add styles here */ }
+.position-s-leftshift { /* Add styles here */ }
+.position-t-leftshift { /* Add styles here */ }
+.position-u-leftshift { /* Add styles here */ }
+.position-v-leftshift { /* Add styles here */ }
+.position-w-leftshift { /* Add styles here */ }
+.position-x-leftshift { /* Add styles here */ }
+.position-y-leftshift { /* Add styles here */ }
+.position-z-leftshift { /* Add styles here */ }
+
+/* Uppercase letters with right shift */
+.position-b-rightshift .leftHand .active { transform: rotate(-39deg); left: calc(80% - 180px);}
+.position-b-rightshift .leftHand .active .fingerJoint { bottom: 70%; }
+.position-b-rightshift .leftHand .active .fingerTip { bottom: 70%; }
+
+.position-q-rightshift .rightHand,
+.position-w-rightshift .rightHand,
+.position-e-rightshift .rightHand,
+.position-r-rightshift .rightHand,
+.position-t-rightshift .rightHand,
+.position-a-rightshift .rightHand,
+.position-s-rightshift .rightHand,
+.position-d-rightshift .rightHand,
+.position-f-rightshift .rightHand,
+.position-g-rightshift .rightHand,
+.position-z-rightshift .rightHand,
+.position-x-rightshift .rightHand,
+.position-c-rightshift .rightHand,
+.position-v-rightshift .rightHand { transform: rotate(-5deg); bottom: -115px;}
+
+.position-q-rightshift .rightHand .index,
+.position-w-rightshift .rightHand .index,
+.position-e-rightshift .rightHand .index,
+.position-r-rightshift .rightHand .index,
+.position-t-rightshift .rightHand .index,
+.position-a-rightshift .rightHand .index,
+.position-s-rightshift .rightHand .index,
+.position-d-rightshift .rightHand .index,
+.position-f-rightshift .rightHand .index,
+.position-g-rightshift .rightHand .index,
+.position-z-rightshift .rightHand .index,
+.position-d-rightshift .rightHand .index,
+.position-e-rightshift .rightHand .index,
+.position-f-rightshift .rightHand .index,
+.position-g-rightshift .rightHand .index { transform: rotate(-25deg); }
+
+.position-q-rightshift .rightHand .middle,
+.position-w-rightshift .rightHand .middle,
+.position-e-rightshift .rightHand .middle,
+.position-r-rightshift .rightHand .middle,
+.position-t-rightshift .rightHand .middle,
+.position-a-rightshift .rightHand .middle,
+.position-s-rightshift .rightHand .middle,
+.position-c-rightshift .rightHand .middle,
+.position-d-rightshift .rightHand .middle,
+.position-e-rightshift .rightHand .middle,
+.position-f-rightshift .rightHand .middle,
+.position-g-rightshift .rightHand .middle { transform: rotate(-25deg); }
+
+.position-q-rightshift .rightHand .ring,
+.position-w-rightshift .rightHand .ring,
+.position-e-rightshift .rightHand .ring,
+.position-r-rightshift .rightHand .ring,
+.position-t-rightshift .rightHand .ring,
+.position-a-rightshift .rightHand .ring,
+.position-s-rightshift .rightHand .ring,
+.position-c-rightshift .rightHand .ring,
+.position-d-rightshift .rightHand .ring,
+.position-e-rightshift .rightHand .ring,
+.position-f-rightshift .rightHand .ring,
+.position-g-rightshift .rightHand .ring { transform: rotate(-15deg); }
+
+.position-q-rightshift .rightHand .thumb,
+.position-w-rightshift .rightHand .thumb,
+.position-e-rightshift .rightHand .thumb,
+.position-r-rightshift .rightHand .thumb,
+.position-t-rightshift .rightHand .thumb,
+.position-a-rightshift .rightHand .thumb,
+.position-s-rightshift .rightHand .thumb,
+.position-c-rightshift .rightHand .thumb,
+.position-d-rightshift .rightHand .thumb,
+.position-e-rightshift .rightHand .thumb,
+.position-f-rightshift .rightHand .thumb,
+.position-g-rightshift .rightHand .thumb { transform: rotate(-30deg); }
+
+.position-q-rightshift .rightHand .active.pinky,
+.position-w-rightshift .rightHand .active.pinky,
+.position-e-rightshift .rightHand .active.pinky,
+.position-r-rightshift .rightHand .active.pinky,
+.position-t-rightshift .rightHand .active.pinky,
+.position-a-rightshift .rightHand .active.pinky,
+.position-s-rightshift .rightHand .active.pinky,
+.position-c-rightshift .rightHand .active.pinky,
+.position-d-rightshift .rightHand .active.pinky,
+.position-c-rightshift .rightHand .active.pinky,
+.position-d-rightshift .rightHand .active.pinky,
+.position-e-rightshift .rightHand .active.pinky,
+.position-f-rightshift .rightHand .active.pinky,
+.position-g-rightshift .rightHand .active.pinky { transform: rotate(40deg); }
+
+.position-q-rightshift .rightHand .active.pinky .fingerJoint,
+.position-w-rightshift .rightHand .active.pinky .fingerJoint,
+.position-e-rightshift .rightHand .active.pinky .fingerJoint,
+.position-r-rightshift .rightHand .active.pinky .fingerJoint,
+.position-t-rightshift .rightHand .active.pinky .fingerJoint,
+.position-a-rightshift .rightHand .active.pinky .fingerJoint,
+.position-s-rightshift .rightHand .active.pinky .fingerJoint,
+.position-c-rightshift .rightHand .active.pinky .fingerJoint,
+.position-b-rightshift .rightHand .active.pinky .fingerJoint,
+.position-c-rightshift .rightHand .active.pinky .fingerJoint,
+.position-d-rightshift .rightHand .active.pinky .fingerJoint,
+.position-e-rightshift .rightHand .active.pinky .fingerJoint,
+.position-f-rightshift .rightHand .active.pinky .fingerJoint,
+.position-g-rightshift .rightHand .active.pinky .fingerJoint { bottom: 0%; }
+
+.position-q-rightshift .rightHand .active.pinky .fingerTip,
+.position-w-rightshift .rightHand .active.pinky .fingerTip,
+.position-e-rightshift .rightHand .active.pinky .fingerTip,
+.position-r-rightshift .rightHand .active.pinky .fingerTip,
+.position-t-rightshift .rightHand .active.pinky .fingerTip,
+.position-a-rightshift .rightHand .active.pinky .fingerTip,
+.position-s-rightshift .rightHand .active.pinky .fingerTip,
+.position-c-rightshift .rightHand .active.pinky .fingerTip,
+.position-d-rightshift .rightHand .active.pinky .fingerTip,
+.position-c-rightshift .rightHand .active.pinky .fingerTip,
+.position-d-rightshift .rightHand .active.pinky .fingerTip,
+.position-e-rightshift .rightHand .active.pinky .fingerTip,
+.position-f-rightshift .rightHand .active.pinky .fingerTip,
+.position-g-rightshift .rightHand .active.pinky .fingerTip { bottom: 50%; }
+
+.position-h-rightshift { /* Add styles here */ }
+.position-i-rightshift { /* Add styles here */ }
+.position-j-rightshift { /* Add styles here */ }
+.position-k-rightshift { /* Add styles here */ }
+.position-l-rightshift { /* Add styles here */ }
+.position-m-rightshift { /* Add styles here */ }
+.position-n-rightshift { /* Add styles here */ }
+.position-o-rightshift { /* Add styles here */ }
+.position-p-rightshift { /* Add styles here */ }
+.position-q-rightshift { /* Add styles here */ }
+.position-r-rightshift { /* Add styles here */ }
+.position-s-rightshift { /* Add styles here */ }
+.position-t-rightshift { /* Add styles here */ }
+.position-u-rightshift { /* Add styles here */ }
+.position-v-rightshift { /* Add styles here */ }
+.position-w-rightshift { /* Add styles here */ }
+.position-x-rightshift { /* Add styles here */ }
+.position-y-rightshift { /* Add styles here */ }
+.position-z-rightshift { /* Add styles here */ }
+
+/* Numbers */
+.position-0 { /* Add styles here */ }
+.position-1 { /* Add styles here */ }
+.position-2 { /* Add styles here */ }
+.position-3 { /* Add styles here */ }
+.position-4 { /* Add styles here */ }
+.position-5 { /* Add styles here */ }
+.position-6 { /* Add styles here */ }
+.position-7 { /* Add styles here */ }
+.position-8 { /* Add styles here */ }
+.position-9 { /* Add styles here */ }
+
+/* Numbers with left shift */
+.position-exclamation-leftshift { /* Add styles here */ }
+.position-at-leftshift { /* Add styles here */ }
+.position-hash-leftshift { /* Add styles here */ }
+.position-dollar-leftshift { /* Add styles here */ }
+.position-percent-leftshift { /* Add styles here */ }
+.position-caret-leftshift { /* Add styles here */ }
+.position-ampersand-leftshift { /* Add styles here */ }
+.position-asterisk-leftshift { /* Add styles here */ }
+.position-parenleft-leftshift { /* Add styles here */ }
+.position-parenright-leftshift { /* Add styles here */ }
+
+/* Numbers with right shift */
+.position-exclamation-rightshift { /* Add styles here */ }
+.position-at-rightshift { /* Add styles here */ }
+.position-hash-rightshift { /* Add styles here */ }
+.position-dollar-rightshift { /* Add styles here */ }
+.position-percent-rightshift { /* Add styles here */ }
+.position-caret-rightshift { /* Add styles here */ }
+.position-ampersand-rightshift { /* Add styles here */ }
+.position-asterisk-rightshift { /* Add styles here */ }
+.position-parenleft-rightshift { /* Add styles here */ }
+.position-parenright-rightshift { /* Add styles here */ }
+
+/* Special characters (base keys that don't require shift) */
+.position-tilde { /* Add styles here */ }
+.position-minus { /* Add styles here */ }
+.position-equals { /* Add styles here */ }
+.position-bracketleft { /* Add styles here */ }
+.position-bracketright { /* Add styles here */ }
+.position-backslash { /* Add styles here */ }
+.position-semicolon { /* Add styles here */ }
+.position-quote { /* Add styles here */ }
+.position-comma { /* Add styles here */ }
+.position-period { /* Add styles here */ }
+.position-slash { /* Add styles here */ }
+
+/* Special characters with left shift */
+.position-tilde-leftshift { /* Add styles here */ }
+.position-underscore-leftshift { /* Add styles here */ }
+.position-plus-leftshift { /* Add styles here */ }
+.position-braceleft-leftshift { /* Add styles here */ }
+.position-braceright-leftshift { /* Add styles here */ }
+.position-pipe-leftshift { /* Add styles here */ }
+.position-colon-leftshift { /* Add styles here */ }
+.position-quote-leftshift { /* Add styles here */ }
+.position-lessthan-leftshift { /* Add styles here */ }
+.position-greaterthan-leftshift { /* Add styles here */ }
+.position-question-leftshift { /* Add styles here */ }
+
+/* Special characters with right shift */
+.position-tilde-rightshift { /* Add styles here */ }
+.position-underscore-rightshift { /* Add styles here */ }
+.position-plus-rightshift { /* Add styles here */ }
+.position-braceleft-rightshift { /* Add styles here */ }
+.position-braceright-rightshift { /* Add styles here */ }
+.position-pipe-rightshift { /* Add styles here */ }
+.position-colon-rightshift { /* Add styles here */ }
+.position-quote-rightshift { /* Add styles here */ }
+.position-lessthan-rightshift { /* Add styles here */ }
+.position-greaterthan-rightshift { /* Add styles here */ }
+.position-question-rightshift { /* Add styles here */ }

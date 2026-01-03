@@ -1,6 +1,5 @@
 import React from 'react';
 import styles from './VirtualKeyboard.module.css';
-import VirtualHands from './VirtualHands';
 import PropTypes from 'prop-types';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -117,6 +116,9 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordCh
     // Handle space character
     if (nextKey === ' ' && keyObj.key === 'Space') return true;
     
+    // Handle newline character
+    if (nextKey === '\n' && keyObj.key === 'Enter') return true;
+    
     // Direct match (case insensitive)
     if (keyObj.key.toLowerCase() === nextKey.toLowerCase()) return true;
     
@@ -155,6 +157,9 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordCh
       
       // Handle space character
       if (char === ' ' && keyObj.key === 'Space') return true;
+      
+      // Handle newline character
+      if (char === '\n' && keyObj.key === 'Enter') return true;
       
       // Direct match (case insensitive)
       if (keyObj.key.toLowerCase() === char.toLowerCase()) return true;
@@ -272,7 +277,6 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordCh
 
   return (
     <div className={styles.keyboard}>
-      <VirtualHands nextKey={nextKey} showHands={showHands} />
       {keyboardLayout.map((row, rowIndex) => (
         <div key={rowIndex} className={styles.keyboardRow}>
           {row.map((keyObj) => {
@@ -283,6 +287,8 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordCh
             const isHighlighted = shouldHighlight(keyObj, nextKey);
             const isHighlightedReduced = showWordHighlight && !isHighlighted && shouldHighlightReduced(keyObj, remainingWordChars);
             
+            const isHomeRowKey = keyObj.key.toLowerCase() === 'f' || keyObj.key.toLowerCase() === 'j';
+            
             return (
               <div
                 key={keyObj.key}
@@ -290,7 +296,8 @@ const VirtualKeyboard = ({ nextKey, showFingerLayout, showHands, remainingWordCh
                   ${keyObj.wide ? styles.wideKey : ''} 
                   ${keyObj.extraWide ? styles.spaceKey : ''} 
                   ${isHighlighted ? styles.highlight : ''}
-                  ${isHighlightedReduced ? styles.highlightReduced : ''}`}
+                  ${isHighlightedReduced ? styles.highlightReduced : ''}
+                  ${isHomeRowKey ? styles.homeRowKey : ''}`}
                 style={fingerColor ? { backgroundColor: fingerColor } : undefined}
               >
                 {primary.includes('\n') ? (

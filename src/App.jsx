@@ -6,6 +6,7 @@ import ResultsModal from './components/ResultsModal'
 import ActionButtons from './components/ActionButtons'
 import TextDisplay from './components/TextDisplay'
 import VirtualKeyboard from './components/VirtualKeyboard'
+import VirtualHands from './components/VirtualHands'
 import Navigation from './components/Navigation'
 import Practice from './pages/Practice'
 import Account from './pages/Account'
@@ -174,6 +175,12 @@ function Home({ showKeyboard, showFingerLayout, showHands, textSource, onSourceC
           showFingerLayout={showFingerLayout}
           showHands={showHands}
           remainingWordChars={getRemainingWordChars()}
+        />
+      )}
+      {showKeyboard && showHands && (
+        <VirtualHands 
+          nextKey={getNextKey()} 
+          showHands={showHands}
         />
       )}
       <ActionButtons
